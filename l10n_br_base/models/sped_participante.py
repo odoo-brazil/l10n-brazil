@@ -20,12 +20,12 @@ if True:
 
     from pybrasil.base import mascara, primeira_maiuscula
     from pybrasil.inscricao import (formata_cnpj, formata_cpf,
-                                    limpa_formatacao,
-                                    formata_inscricao_estadual, valida_cnpj,
-                                    valida_cpf, valida_inscricao_estadual)
+                                limpa_formatacao,
+                                formata_inscricao_estadual, valida_cnpj,
+                                valida_cpf, valida_inscricao_estadual)
     from pybrasil.telefone import (formata_fone, valida_fone_fixo,
-                                   valida_fone_celular,
-                                   valida_fone_internacional)
+                               valida_fone_celular,
+                               valida_fone_internacional)
 
 #except (ImportError, IOError) as err:
 #    _logger.debug(err)
@@ -51,7 +51,7 @@ class Participante(models.Model):
         index=True
     )
     nome = fields.Char(
-        string=u'uNome',
+        string=u'Nome',
         size=60,
         index=True
     )
@@ -297,6 +297,11 @@ class Participante(models.Model):
         default=REGIME_TRIBUTARIO_SIMPLES,
         index=True,
     )
+    payment_term_id = fields.Many2one(
+        comodel_name='account.payment.term',
+        string=u'Condição de pagamento',
+        ondelete='restrict',
+    )
 
     @api.depends('cnpj_cpf')
     def _compute_tipo_pessoa(self):
@@ -341,38 +346,27 @@ class Participante(models.Model):
             else:
                 self.exige_endereco = False
 
-                # @api.depends('nome', 'razao_social', 'fantasia', 'cnpj_cpf')
-                # def name_get(self, cr, uid, ids, context={}):
-                # if not len(ids):
-                # return []
+    @api.multi
+    def name_get(self):
+        res = []
 
-                # res = []
-                # for partner_obj in self.browse(cr, uid, ids):
-                # if hasattr(partner_obj, 'nome'):
-                # nome = partner_obj.nome or ''
+        for participante in self:
+            nome = participante.nome
 
-                # if partner_obj.cnpj_cpf:
-                # nome += ' - ' + partner_obj.cnpj_cpf
+            if participante.razao_social:
+                if participante.nome.strip().upper() != \
+                    participante.razao_social.strip().upper():
+                    nome += u' - '
+                    nome += participante.razao_social
 
-                # if partner_obj.razao_social and
-                # partner_obj.razao_social.upper() != partner_obj.nome.upper():
-                # nome += ' [' + partner_obj.razao_social + ']'
+            if participante.cnpj_cpf:
+                nome += u' ['
+                nome += participante.cnpj_cpf
+                nome += u'] '
 
-                # if partner_obj.fantasia and
-                #  partner_obj.fantasia.upper() != partner_obj.nome.upper():
-                # if partner_obj.razao_social:
-                # if partner_obj.razao_social.upper()
-                # != partner_obj.fantasia.upper():
-                # nome += ' [' + partner_obj.fantasia + ']'
+            res.append((participante.id, nome))
 
-                # else:
-                # nome += ' [' + partner_obj.fantasia + ']'
-
-                # res.append((partner_obj.id, nome))
-                # else:
-                # res.append((partner_obj.id, ''))
-
-                # return res
+        return res
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
@@ -385,6 +379,8 @@ class Participante(models.Model):
                 '|',
                 ('codigo', '=', name),
                 '|',
+                ('nome', 'ilike', name),
+                '|',
                 ('razao_social', 'ilike', name),
                 '|',
                 ('fantasia', 'ilike', name),
@@ -392,6 +388,8 @@ class Participante(models.Model):
                 ('cnpj_cpf', 'ilike', mascara(name, '  .   .   /    -  ')),
                 ('cnpj_cpf', 'ilike', mascara(name, '   .   .   -  ')),
             ]
+            participantes = self.search(args, limit=limit)
+            return participantes.name_get()
 
         return super(Participante, self).name_search(name=name, args=args,
                                                      operator=operator,
@@ -654,50 +652,26 @@ class Participante(models.Model):
         valores = {}
         res['value'] = valores
 
-        if self.nome:
-            valores['nome'] = primeira_maiuscula(self.nome)
+        #if self.nome:
+        #    valores['nome'] = primeira_maiuscula(self.nome)
 
-        if self.razao_social:
-            valores['razao_social'] = primeira_maiuscula(self.razao_social)
+        #if self.razao_social:
+        #    valores['razao_social'] = primeira_maiuscula(self.razao_social)
 
-        if self.fantasia:
-            valores['fantasia'] = primeira_maiuscula(self.fantasia)
+        #if self.fantasia:
+        #    valores['fantasia'] = primeira_maiuscula(self.fantasia)
 
-        if self.endereco:
-            valores['endereco'] = primeira_maiuscula(self.endereco)
+        #if self.endereco:
+        #    valores['endereco'] = primeira_maiuscula(self.endereco)
 
-        if self.bairro:
-            valores['bairro'] = primeira_maiuscula(self.bairro)
+        #if self.bairro:
+        #    valores['bairro'] = primeira_maiuscula(self.bairro)
 
-        if self.cidade:
-            valores['cidade'] = primeira_maiuscula(self.cidade)
+        #if self.cidade:
+        #    valores['cidade'] = primeira_maiuscula(self.cidade)
 
-        if self.profissao:
-            valores['profissao'] = primeira_maiuscula(self.profissao)
-
-        return res
-
-    @api.onchange('regime_tributario')
-    def onchange_regime_tributario(self):
-        res = {}
-        valores = {}
-        res['value'] = valores
-
-        if self.regime_tributario == REGIME_TRIBUTARIO_SIMPLES:
-            valores['al_pis_cofins_id'] = self.env.ref(
-                'sped.ALIQUOTA_PIS_COFINS_SIMPLES').id
-
-        elif self.regime_tributario == REGIME_TRIBUTARIO_SIMPLES_EXCESSO:
-            valores['al_pis_cofins_id'] = self.env.ref(
-                'sped.ALIQUOTA_PIS_COFINS_LUCRO_PRESUMIDO').id
-
-        elif self.regime_tributario == REGIME_TRIBUTARIO_LUCRO_PRESUMIDO:
-            valores['al_pis_cofins_id'] = self.env.ref(
-                'sped.ALIQUOTA_PIS_COFINS_LUCRO_PRESUMIDO').id
-
-        elif self.regime_tributario == REGIME_TRIBUTARIO_LUCRO_REAL:
-            valores['al_pis_cofins_id'] = self.env.ref(
-                'sped.ALIQUOTA_PIS_COFINS_LUCRO_REAL').id
+        #if self.profissao:
+        #    valores['profissao'] = primeira_maiuscula(self.profissao)
 
         return res
 
