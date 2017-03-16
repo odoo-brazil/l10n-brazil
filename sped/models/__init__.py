@@ -11,9 +11,7 @@
 #
 # Cadastros básicos
 #
-from . import sped_participante
-from . import sped_empresa
-from . import inherited_res_partner
+
 
 
 from . import sped_veiculo

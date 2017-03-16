@@ -53,3 +53,5 @@ from . import sped_natureza_operacao
 from . import sped_operacao
 from . import sped_operacao_item
 
+from . import sped_empresa
+

@@ -39,12 +39,6 @@
         #
         # Módulo Cadastro: participantes, produtos etc.
         #
-        'views/sped_empresa_view.xml',
-        'views/sped_empresa_vincula_company_view.xml',
-
-        'views/sped_participante_cliente_view.xml',
-        'views/sped_participante_fornecedor_view.xml',
-        'views/sped_participante_vincula_partner_view.xml',
 
         'views/sped_produto_produto_view.xml',
         'views/sped_unidade_produto_view.xml',

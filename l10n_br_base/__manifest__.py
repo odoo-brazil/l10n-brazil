@@ -12,6 +12,7 @@
     'depends': [
         'base',
         'base_setup',
+        'mail',
     ],
     'data': [
 
@@ -33,6 +34,11 @@
         'views/sped_estado_view.xml',
         'views/sped_municipio_view.xml',
         'views/sped_pais_view.xml',
+        'views/sped_empresa_view.xml',
+        'views/sped_empresa_vincula_company_view.xml',
+        'views/sped_participante_cliente_view.xml',
+        'views/sped_participante_fornecedor_view.xml',
+        'views/sped_participante_vincula_partner_view.xml',
     ],
     'demo': [
         # 'demo/l10n_br_base_demo.xml',

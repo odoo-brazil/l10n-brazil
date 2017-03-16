@@ -36,11 +36,4 @@
         name="Configuração"
         />
 
-    <menuitem
-        parent="menu_cadastro_configuracao"
-        sequence="100"
-        id="menu_cadastro_vinculo"
-        name="Vínculos"
-        />
-
 </odoo>

@@ -11,3 +11,6 @@ from . import res_config
 from . import sped_pais
 from . import sped_estado
 from . import sped_municipio
+from . import sped_participante
+from . import sped_empresa
+from . import inherited_res_partner
