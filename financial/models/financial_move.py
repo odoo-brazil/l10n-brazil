@@ -3,10 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models, _
+from odoo.tools import float_is_zero, float_compare
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_is_zero
-from odoo.tools.safe_eval import safe_eval
-
 
 FINANCIAL_MOVE = [
     ('r', u'Account Receivable'),
@@ -147,6 +145,11 @@ class FinancialMove(models.Model):
         comodel_name='account.payment.term',
         track_visibility='onchange',
     )
+    payment_term_id = fields.Many2one(
+        string=u'Payment term',
+        comodel_name='account.payment.term',
+        track_visibility='onchange',
+    )
     analytic_account_id = fields.Many2one(
         comodel_name='account.analytic.account',
         string=u'Analytic account'
@@ -154,7 +157,6 @@ class FinancialMove(models.Model):
     account_id = fields.Many2one(
         comodel_name='account.account',
         string=u'Account',
-        required=True,
         readonly=True, states={'draft': [('readonly', False)]},
         domain=[('internal_type', '=', 'other')],
         help="The partner account used for this invoice."
@@ -276,7 +278,13 @@ class FinancialMove(models.Model):
                 record.ref_item = '1'
 
     def _before_create(self, values):
-        return values
+        # TODO: call this method in action_confirm to avoid sequence gaps
+        if values.get('name', 'New') == 'New':
+            values['ref'] = self.env['ir.sequence'].next_by_code(
+                    FINANCIAL_SEQUENCE[values.get('financial_type')]
+            ) or 'New'
+        if not values.get('ref_item'):
+            values['ref_item'] = '1'
 
     @api.model
     def create(self, values):
@@ -305,6 +313,9 @@ class FinancialMove(models.Model):
     def unlink(self):
         for financial in self:
             if financial.state not in ('draft', 'cancel'):
+                raise UserError(
+                    _('You cannot delete an financial move which is not \n'
+                      'draft or cancelled'))
                 if financial.document_number:
                     # TODO: Improve this validation!
                     raise UserError(
@@ -402,4 +413,3 @@ class FinancialMove(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
-

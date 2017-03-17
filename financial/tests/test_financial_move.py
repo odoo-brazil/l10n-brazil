@@ -24,6 +24,7 @@ class TestFinancialMove(TransactionCase):
         self.financial_edit = self.env['financial.edit']
         self.partner_agrolait = self.env.ref("base.res_partner_2")
         self.partner_axelor = self.env.ref("base.res_partner_2")
+        # self.financial_move.create = self.env['financial.move.create.']
 
         self.bank_journal_id = self.env['account.journal'].search(
             [
@@ -39,6 +40,8 @@ class TestFinancialMove(TransactionCase):
             partner_id=self.partner_agrolait.id,
             document_date=time.strftime('%Y') + '-01-01',
             document_number='1111',
+            move_type='r',
+            account_id=44,
             financial_type='r',
         ))
 
@@ -50,7 +53,7 @@ class TestFinancialMove(TransactionCase):
         QUANDO criado um lançamento de contas a receber
         ENTÃO a data de vencimento útil deve ser de 01/03/2017"""
 
-        self.assertEqual(self.cr_1.date_business_maturity, '2017-03-01')
+        self.assertEqual(self.cr_1.business_due_date, '2017-03-01')
 
     def test_us_1_ac_2(self):
         """DADO uma conta a pagar ou receber
