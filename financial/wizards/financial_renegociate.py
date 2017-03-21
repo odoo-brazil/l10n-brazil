@@ -14,9 +14,9 @@ class FinancialRenegociate(models.TransientModel):
     @api.multi
     def doit(self):
         result_ids = []
-        for wizard in self:
-            # TODO
-            pass
+        # for wizard in self:
+        #     # TODO
+        #     pass
         action = {
             'type': 'ir.actions.act_window',
             'name': 'Action Name',  # TODO

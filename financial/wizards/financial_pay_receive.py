@@ -72,4 +72,5 @@ class FinancialPayreceive(models.TransientModel):
             )
 
             vals['financial_payment_id'] = active_id
+            vals['account_id'] = 44
             account_financial.create(vals)
