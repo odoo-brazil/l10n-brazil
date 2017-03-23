@@ -18,6 +18,7 @@
     ],
     'data': [
         'data/ir_sequence_data.xml',
+        'data/financial_move_data.xml',
         'views/financial_menu.xml',
         'wizards/financial_cancel.xml',
         'wizards/financial_edit.xml',
@@ -25,6 +26,7 @@
         'wizards/financial_pay_receive.xml',
         'views/financial_move.xml',
         'views/res_partner_bank.xml',
+        'views/payment_mode.xml',
         'report/financial_cashflow.xml',
         'report/financial_statement_report.xml',
         'report/report_financial.xml',
