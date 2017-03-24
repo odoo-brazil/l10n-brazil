@@ -27,7 +27,7 @@ class FinancialStatementReport(models.Model):
         string=u"Report format",
         selection=[
             ('pdf', u'PDF'),
-            ('xls', u'XLS'), # TODO
+            ('xls', u'XLS'),  # TODO
         ]
     )
     included_ids = fields.One2many(
@@ -54,7 +54,7 @@ class FinancialStatementReport(models.Model):
         if data['enable_filter']:
             comparison_res = self.with_context(
                 data.get('comparison_context'))._compute_report_balance(
-                child_reports)
+                    child_reports)
             for report_id, value in comparison_res.items():
                 res[report_id]['comp_bal'] = value['balance']
                 report_acc = res[report_id].get('account')
@@ -110,9 +110,9 @@ class FinancialStatementReport(models.Model):
                         vals['debit'] = value['debit']
                         vals['credit'] = value['credit']
                         if (not account.company_id.currency_id.is_zero(
-                            vals['debit']) or not
+                                vals['debit']) or not
                                 account.company_id.currency_id.is_zero(
-                                vals['credit'])):
+                                    vals['credit'])):
                             flag = True
                     if not account.company_id.currency_id.is_zero(
                             vals['balance']):

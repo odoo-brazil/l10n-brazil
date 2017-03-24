@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_included_credit_limit_checkbox" model="ir.ui.view">
+        <field name="name">account.included.credit.limit.checkbox</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id"
+               ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_calculation_rounding_method']"
+                   position="after">
+                <group name="credit_control" string="Credit Control">
+                    <field name="sale_installed" invisible="1"/>
+                    <field name="draft_invoices" type="checkbox"/>
+                    <field name="confirmed_orders" type="checkbox"
+                           attrs="{'invisible': [('sale_installed', '=', False)]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

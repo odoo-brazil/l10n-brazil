@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="available_credit_limit_form" model="ir.ui.view">
+        <field name="name">res.partner.credit_limit_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id"
+               ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="website" position="after">
+                <field name="credit_limit"/>
+                <field name="available_credit_limit"/>
+            </field>
+        </field>
+    </record>
+</odoo>
