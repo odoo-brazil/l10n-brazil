@@ -6,7 +6,6 @@ from datetime import datetime
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_is_zero
-from odoo.tools.safe_eval import safe_eval
 
 
 FINANCIAL_MOVE = [
@@ -332,11 +331,20 @@ class FinancialMove(models.Model):
     @api.multi
     def action_number(self):
         for record in self:
-            if record.ref == 'New':
-                record.ref = self.env['ir.sequence'].next_by_code(
-                    FINANCIAL_SEQUENCE[record.financial_type]) or 'New'
-            if not record.ref_item:
-                record.ref_item = '1'
+            if record.ref == _('New'):
+                sequencial_ids = self.search([
+                    ('document_number', '=', record.document_number),
+                ], order='date_business_maturity')
+                if self.search_count([
+                    ('document_number', '=', record.document_number),
+                    ('ref', '=', _('New')),
+                ]) == len(sequencial_ids.ids):
+                    sequencial_ids.write({
+                        'ref': self.env['ir.sequence'].next_by_code(
+                            FINANCIAL_SEQUENCE[record.financial_type]) or 'New'
+                    })
+                    for i, x in enumerate(sequencial_ids):
+                        x.ref_item = i+1
 
     def _before_create(self, values):
         return values
@@ -422,16 +430,13 @@ class FinancialMove(models.Model):
             })
 
     @staticmethod
-    def _prepare_payment(bank_id, company_id, currency_id,
-                         financial_type, partner_id, document_number,
-                         date, date_maturity, amount,
-                         analytic_account_id=False, account_id=False,
-                         payment_term_id=False, payment_mode_id=False,
-                         args=False):
-        if not args:
-            args = {}
+    def _prepare_financial_move(bank_id, company_id, currency_id,
+                                financial_type, partner_id, document_number,
+                                date, date_maturity, amount,
+                                analytic_account_id=False, account_id=False,
+                                payment_term_id=False, payment_mode_id=False,
+                                **kwargs):
         return dict(
-            args,
             bank_id=bank_id,
             company_id=company_id,
             currency_id=currency_id,
@@ -445,6 +450,7 @@ class FinancialMove(models.Model):
             account_id=account_id,
             date_maturity=date_maturity,
             amount=amount,
+            **kwargs
         )
 
     @api.multi

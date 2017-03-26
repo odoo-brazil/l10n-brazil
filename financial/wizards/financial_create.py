@@ -107,7 +107,8 @@ class FinancialMoveCreate(models.TransientModel):
         financial_type = False
         for record in self:
             for move in record.line_ids:
-                vals = financial_move._prepare_payment(
+                kargs = {}
+                values = financial_move._prepare_financial_move(
                     bank_id=self.bank_id.id,
                     company_id=self.company_id.id,
                     currency_id=self.currency_id.id,
@@ -121,8 +122,10 @@ class FinancialMoveCreate(models.TransientModel):
                     account_id=self.account_id.id,
                     date_maturity=move.date_maturity,
                     amount=move.amount,
+                    note=record.note,
+                    **kargs
                 )
-                financial = financial_move.create(vals)
+                financial = financial_move.create(values)
                 financial.action_confirm()
                 financial_move |= financial
                 financial_type = record.financial_type
