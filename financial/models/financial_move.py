@@ -332,28 +332,9 @@ class FinancialMove(models.Model):
     @api.multi
     def action_number(self):
         for record in self:
-
-            if record.ref == _('New'):
+            if record.ref == 'New':
                 record.ref = self.env['ir.sequence'].next_by_code(
-                    FINANCIAL_SEQUENCE[record.financial_type]) or _('New')
-            if not record.ref_item:
-                record.ref_item = '1'
-
-    journal_id = fields.Many2one(
-        required=False,
-    )
-    bank_id = fields.Many2one(
-        'res.partner.bank',
-        string=u'Bank Account',
-    )
-
-    @api.multi
-    def action_number(self):
-        for record in self:
-
-            if record.ref == _('New'):
-                record.ref = self.env['ir.sequence'].next_by_code(
-                    FINANCIAL_SEQUENCE[record.financial_type]) or _('New')
+                    FINANCIAL_SEQUENCE[record.financial_type]) or 'New'
             if not record.ref_item:
                 record.ref_item = '1'
 
@@ -410,7 +391,7 @@ class FinancialMove(models.Model):
     def action_confirm(self):
         for record in self:
             record.change_state('open')
-            record.action_number()
+        self.action_number()
 
     @api.multi
     def action_budget(self):
