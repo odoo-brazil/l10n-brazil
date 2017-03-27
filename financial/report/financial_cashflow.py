@@ -164,6 +164,42 @@ class FinancialCashflow(models.Model):
                     financial_move.financial_type = 'r';
         """)
         self.env.cr.execute("""
+            CREATE OR REPLACE VIEW financial_cashflow_credit_rr AS
+                SELECT
+                    financial_move.create_date,
+                    financial_move.id,
+                    financial_move.document_number,
+                    financial_move.financial_type,
+
+                    financial_move.state,
+                    financial_move.date_business_maturity,
+                    financial_move.date,
+                    financial_move.payment_method_id,
+                    financial_move.payment_term_id,
+
+                    financial_move.date_maturity,
+                    financial_move.partner_id,
+                    financial_move.currency_id,
+
+                    financial_move.account_id,
+                    financial_move.analytic_account_id,
+                    financial_move.bank_id,
+                    financial_move.journal_id,
+                    coalesce(financial_move.amount_paid, 0)
+                        AS amount_paid,
+                    coalesce(financial_move.amount_total, 0)
+                        AS amount_total,
+                    coalesce(financial_move.amount_total, 0)
+                        AS amount_credit,
+                    0 AS amount_debit,
+                    coalesce(financial_move.amount_total, 0)
+                        AS amount_balance
+                FROM
+                    public.financial_move
+                WHERE
+                    financial_move.financial_type = 'rr';
+        """)
+        self.env.cr.execute("""
             CREATE OR REPLACE VIEW financial_cashflow_bank AS
                 SELECT
                     res_partner_bank.date_balance as create_date,
@@ -262,6 +298,33 @@ class FinancialCashflow(models.Model):
                 UNION ALL
 
                 SELECT
+                    crr.create_date,
+                    crr.id,
+                    crr.document_number,
+                    crr.financial_type,
+                    crr.state,
+                    crr.date_business_maturity,
+                    crr.date,
+                    crr.payment_method_id,
+                    crr.payment_term_id,
+                    crr.date_maturity,
+                    crr.partner_id,
+                    crr.currency_id,
+                    crr.account_id,
+                    crr.analytic_account_id,
+                    crr.journal_id,
+                    crr.bank_id,
+                    crr.amount_total,
+                    crr.amount_paid,
+                    crr.amount_credit,
+                    crr.amount_debit,
+                    crr.amount_balance
+                FROM
+                    financial_cashflow_credit_rr crr
+
+                UNION ALL
+
+                SELECT
                     d.create_date,
                     d.id,
                     d.document_number,
@@ -285,6 +348,7 @@ class FinancialCashflow(models.Model):
                     d.amount_balance
                 FROM
                     financial_cashflow_debit d
+
                 UNION ALL
 
                 SELECT
