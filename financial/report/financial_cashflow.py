@@ -260,6 +260,45 @@ class FinancialCashflow(models.Model):
                     coalesce(financial_move.amount_total, 0)
                         AS amount_total,
                     0 AS amount_credit,
+                    (-1) * coalesce(financial_move.amount_residual, 0)
+                        AS amount_debit,
+                    (-1) * coalesce(financial_move.amount_total, 0)
+                        AS amount_balance
+                FROM
+                    public.financial_move
+                WHERE
+                    financial_move.financial_type = 'p' and
+                    financial_move.amount_residual != 0.0
+                ;
+        """)
+
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW financial_cashflow_debit_pp AS
+                SELECT
+                    financial_move.create_date,
+                    financial_move.id,
+                    financial_move.document_number,
+                    financial_move.financial_type,
+
+                    financial_move.state,
+                    financial_move.date_business_maturity,
+                    financial_move.date,
+                    financial_move.payment_method_id,
+                    financial_move.payment_term_id,
+
+                    financial_move.date_maturity,
+                    financial_move.partner_id,
+                    financial_move.currency_id,
+
+                    financial_move.account_id,
+                    financial_move.analytic_account_id,
+                    financial_move.bank_id,
+                    financial_move.journal_id,
+                    coalesce(financial_move.amount_paid, 0)
+                        AS amount_paid,
+                    coalesce(financial_move.amount_total, 0)
+                        AS amount_total,
+                    0 AS amount_credit,
                     (-1) * coalesce(financial_move.amount_total, 0)
                         AS amount_debit,
                     (-1) * coalesce(financial_move.amount_total, 0)
@@ -267,7 +306,7 @@ class FinancialCashflow(models.Model):
                 FROM
                     public.financial_move
                 WHERE
-                    financial_move.financial_type = 'p';
+                    financial_move.financial_type = 'pp';
         """)
 
         self.env.cr.execute("""
@@ -350,6 +389,32 @@ class FinancialCashflow(models.Model):
                     d.amount_balance
                 FROM
                     financial_cashflow_debit d
+
+                UNION ALL
+                SELECT
+                    dpp.create_date,
+                    dpp.id,
+                    dpp.document_number,
+                    dpp.financial_type,
+                    dpp.state,
+                    dpp.date_business_maturity,
+                    dpp.date,
+                    dpp.payment_method_id,
+                    dpp.payment_term_id,
+                    dpp.date_maturity,
+                    dpp.partner_id,
+                    dpp.currency_id,
+                    dpp.account_id,
+                    dpp.analytic_account_id,
+                    dpp.journal_id,
+                    dpp.bank_id,
+                    dpp.amount_total,
+                    dpp.amount_paid,
+                    dpp.amount_credit,
+                    dpp.amount_debit,
+                    dpp.amount_balance
+                FROM
+                    financial_cashflow_debit_pp dpp
 
                 UNION ALL
 
