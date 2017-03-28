@@ -153,7 +153,7 @@ class FinancialCashflow(models.Model):
                         AS amount_paid,
                     coalesce(financial_move.amount_total, 0)
                         AS amount_total,
-                    coalesce(financial_move.amount_total, 0)
+                    coalesce(financial_move.amount_residual, 0)
                         AS amount_credit,
                     0 AS amount_debit,
                     coalesce(financial_move.amount_total, 0)
@@ -161,7 +161,9 @@ class FinancialCashflow(models.Model):
                 FROM
                     public.financial_move
                 WHERE
-                    financial_move.financial_type = 'r';
+                    financial_move.financial_type = 'r' and
+                    financial_move.amount_residual != 0.0
+                ;
         """)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW financial_cashflow_credit_rr AS
