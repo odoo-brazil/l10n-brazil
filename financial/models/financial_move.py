@@ -498,3 +498,31 @@ class FinancialMove(models.Model):
                              delay_fee_percent / 100) * record.amount
                 record.amount_interest = interest + delay_fee
         pass
+
+    def create_contract(self, financial_create):
+        financial_move = self.env['financial.move']
+        for record in financial_create:
+            for move in record.line_ids:
+                kargs = {}
+                values = self._prepare_financial_move(
+                    bank_id=financial_create.bank_id.id,
+                    company_id=financial_create.company_id.id,
+                    currency_id=financial_create.currency_id.id,
+                    financial_type=financial_create.financial_type,
+                    partner_id=financial_create.partner_id.id,
+                    document_number=move.document_item,
+                    date=financial_create.date,
+                    payment_mode_id=financial_create.payment_mode_id.id,
+                    payment_term_id=financial_create.payment_term_id.id,
+                    analytic_account_id=
+                    financial_create.analytic_account_id.id,
+                    account_id=financial_create.account_id.id,
+                    date_maturity=move.date_maturity,
+                    amount=move.amount,
+                    note=record.note,
+                    **kargs
+                )
+                financial = self.create(values)
+                financial.action_confirm()
+                financial_move |= financial
+        return financial_move
