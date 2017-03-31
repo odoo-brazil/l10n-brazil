@@ -6,6 +6,10 @@ from odoo import api, fields, models
 import datetime
 
 
+def data_proxima_util(data_inicial, dias_uteis):
+    pass
+
+
 class FinancialPayreceive(models.TransientModel):
 
     _name = 'financial.pay_receive'
@@ -44,6 +48,29 @@ class FinancialPayreceive(models.TransientModel):
         comodel_name='account.payment.mode',
         string=u'Payment mode',
     )
+#    payment_term_id = fields.Many2one(
+#        comodel_name='account.payment.term',
+#        string=u'Payment term',
+#    )
+
+#    @api.depends('payment_mode_id', 'amount', 'date_business_maturity')
+#    def compute_interest(self):
+#        for record in self:
+#            if self.env['resource.calendar']. \
+#                    data_eh_dia_util_bancario(datetime.today()) and record. \
+#                    state == 'open' and \
+#                    (datetime.today() > datetime.strptime
+#                        (record.date_business_maturity, '%Y-%m-%d')):
+#                day = (
+#                    datetime.today() - datetime.strptime(
+#                        record.date_maturity,
+#                        '%Y-%m-%d'))
+#                interest = record.amount * (record.payment_mode_id.
+#                                            interest_percent * day.days) / 100
+#
+#                delay_fee = (record.payment_mode_id.
+#                             delay_fee_percent / 100) * record.amount
+#                record.amount_interest = interest + delay_fee
 
     @api.onchange('payment_mode_id', 'date_payment')
     def _compute_date_credit_debit(self):
