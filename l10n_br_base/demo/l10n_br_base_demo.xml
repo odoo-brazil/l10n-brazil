@@ -454,7 +454,7 @@
         <record id="res_partner_cliente10_mg" model="res.partner">
             <field name="name">Cliente 10 MG - PF Não Contribuinte</field>
             <field name="legal_name">Cliente 10 PF</field>
-            <field name="cnpj_cpf">333.333.333-33</field>
+            <field name="cnpj_cpf">346.585.537-08</field>
             <field name="street">R PRESIDENTE ROOSEVELT</field>
             <field name="number">63</field>
             <field name="district">Morro Chic</field>
@@ -470,6 +470,73 @@
             <field name="customer" eval="1"/>
             <field name="supplier" eval="0"/>
             <field name="is_company" eval="0"/>
+            <field name="active" eval="1"/>
+        </record>
+
+        <record id="res_partner_cliente11_sp" model="res.partner">
+            <field name="name">Cliente 11 -SP - PF Não Contribuinte</field>
+            <field name="legal_name">Cliente 11 - SP</field>
+            <field name="cnpj_cpf">321.690.262-58</field>
+            <field name="street">Rua Batista Scavone</field>
+            <field name="number">201</field>
+            <field name="district">Jardim Leonidia</field>
+            <field name="street2"></field>
+            <field name="state_id" ref="base.state_br_sp"/>
+            <field name="l10n_br_city_id" ref="l10n_br_base.city_3524402"/>
+            <field name="zip">12327-130</field>
+            <field name="country_id" ref="base.br"/>
+            <field name="website">www.cliente11.com.br</field>
+            <field name="phone">(12) 7777-7777</field>
+            <field name="email">cliente11@cliente11.com.br</field>
+            <field name="inscr_est"></field>
+            <field name="customer" eval="1"/>
+            <field name="supplier" eval="0"/>
+            <field name="is_company" eval="0"/>
+            <field name="active" eval="1"/>
+        </record>
+
+        <record id="res_partner_cliente12_sp" model="res.partner">
+            <field name="name">Cliente 12 -SP - PJ Não Contribuinte</field>
+            <field name="legal_name">Cliente 12 - SP</field>
+            <field name="cnpj_cpf">94.296.822/0001-05</field>
+            <field name="street">Rua Batista Scavone</field>
+            <field name="number">201</field>
+            <field name="district">Jardim Leonidia</field>
+            <field name="street2"></field>
+            <field name="state_id" ref="base.state_br_sp"/>
+            <field name="l10n_br_city_id" ref="l10n_br_base.city_3524402"/>
+            <field name="zip">12327-130</field>
+            <field name="country_id" ref="base.br"/>
+            <field name="website">www.cliente12.com.br</field>
+            <field name="phone">(12) 7777-7777</field>
+            <field name="email">cliente12@cliente12.com.br</field>
+            <field name="inscr_est"></field>
+            <field name="customer" eval="1"/>
+            <field name="supplier" eval="0"/>
+            <field name="is_company" eval="0"/>
+            <field name="active" eval="1"/>
+        </record>
+
+        <record id="res_partner_kmee" model="res.partner">
+            <field name="name">KMEE</field>
+            <field name="legal_name">KMEE INFORMATICA LTDA</field>
+            <field name="cnpj_cpf">23.130.935/0001-98</field>
+            <field name="street">Rua Coronel Renno</field>
+            <field name="number">1275</field>
+            <field name="district">BPS</field>
+            <field name="street2"></field>
+            <field name="state_id" ref="base.state_br_mg"/>
+            <field name="l10n_br_city_id" ref="l10n_br_base.city_3132404"/>
+            <field name="zip">37500-050</field>
+            <field name="country_id" ref="base.br"/>
+            <field name="website">www.kmee.com.br</field>
+            <field name="phone">(11) 3090-9303</field>
+            <field name="email">contato@kmee.com.br</field>
+            <field name="inscr_est"></field>
+            <field name="inscr_mun">025585</field>
+            <field name="customer" eval="1"/>
+            <field name="supplier" eval="1"/>
+            <field name="is_company" eval="1"/>
             <field name="active" eval="1"/>
         </record>
 
