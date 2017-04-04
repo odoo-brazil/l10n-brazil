@@ -20,6 +20,7 @@ from ..constante_tributaria import (
     REGIME_TRIBUTARIO_SIMPLES,
     REGIME_TRIBUTARIO_SIMPLES_EXCESSO,
     TIPO_PESSOA_JURIDICA,
+    TIPO_PESSOA_FISICA,
 )
 
 _logger = logging.getLogger(__name__)
