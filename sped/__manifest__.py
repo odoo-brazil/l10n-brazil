@@ -110,5 +110,8 @@
         'views/sped_documento_emissao_nfe_view.xml',
         'views/sped_documento_emissao_nfce_view.xml',
         # 'views/sped_documento_recebimento_nfe_view.xml',
-    ]
+    ],
+    'demo': [
+        'demo/sped_produto_demo.xml'
+    ],
 }
