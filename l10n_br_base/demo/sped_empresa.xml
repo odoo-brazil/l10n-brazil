@@ -11,5 +11,24 @@
     </record>
     -->
 
+    <record model="sped.empresa" id="sped_empresa_demo_1">
+        <field name="nome">Sua Empresa</field>
+        <field name='razao_social'>Sua Empresa</field>
+        <field name="cnpj_cpf">81.583.054/0001-29</field>
+        <field name="endereco">Avenida Paulista</field>
+        <field name="numero">1</field>
+        <field name="bairro">Bela Vista</field>
+        <!--<field name="estado" ref="ESTADO_MG"/>-->
+        <field name="municipio_id" ref="MUNICIPIO_35503080000"/>
+        <field name="cep">01311-000</field>
+        <field name="site">www.suaempresa.com.br</field>
+        <field name="fone">11 3999-9999</field>
+        <field name="email">info@suaempresa.com.br</field>
+        <field name="ie">078.016.350.838</field>
+        <field name="eh_cliente" eval="0"/>
+        <field name="eh_fornecedor" eval="0"/>
+        <field name="eh_empresa" eval="1"/>
+    </record>
+
 </data>
 </odoo>
