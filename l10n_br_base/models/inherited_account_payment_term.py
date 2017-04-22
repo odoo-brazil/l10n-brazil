@@ -6,13 +6,11 @@
 #
 
 from __future__ import division, print_function, unicode_literals
-
+from dateutil.relativedelta import relativedelta
 import logging
 
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
-from dateutil.relativedelta import relativedelta
-from odoo.addons.l10n_br_base.constante_tributaria import (
+from ..constante_tributaria import (
     FORMA_PAGAMENTO,
     BANDEIRA_CARTAO,
     INTEGRACAO_CARTAO,
@@ -28,8 +26,9 @@ _logger = logging.getLogger(__name__)
 
 try:
     from pybrasil.valor.decimal import Decimal as D
-    from pybrasil.data
-
+    from pybrasil.data import (
+        dia_util_pagamento
+    )
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
@@ -98,10 +97,10 @@ class AccountPaymentTerm(models.Model):
             nome_comercial = ''
             if payment_term.forma_pagamento in FORMA_PAGAMENTO_CARTOES:
                 if payment_term.forma_pagamento == \
-                    FORMA_PAGAMENTO_CARTAO_CREDITO:
+                        FORMA_PAGAMENTO_CARTAO_CREDITO:
                     nome_comercial += '[Crédito '
                 elif payment_term.forma_pagamento == \
-                    FORMA_PAGAMENTO_CARTAO_DEBITO:
+                        FORMA_PAGAMENTO_CARTAO_DEBITO:
                     nome_comercial += '[Débito '
 
                 nome_comercial += \

@@ -10,14 +10,8 @@ from __future__ import division, print_function, unicode_literals
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-from odoo.addons.l10n_br_base.constante_tributaria import (
-    AMBIENTE_NFE,
+from ..constante_tributaria import (
     INDICADOR_IE_DESTINATARIO_CONTRIBUINTE,
-    REGIME_TRIBUTARIO_LUCRO_PRESUMIDO,
-    REGIME_TRIBUTARIO_LUCRO_REAL,
-    REGIME_TRIBUTARIO_SIMPLES,
-    REGIME_TRIBUTARIO_SIMPLES_EXCESSO,
-    TIPO_EMISSAO_NFE,
 )
 
 
@@ -365,7 +359,7 @@ class SpedEmpresa(models.Model):
             dados.update(rml_paper_format='a4')
             dados.update(paperformat_id=self.env.ref(
                 'report.paperformat_euro').id
-                         )
+            )
             dados.update(currency_id=self.env.ref('base.BRL').id)
 
         return dados
@@ -385,20 +379,17 @@ class SpedEmpresa(models.Model):
                 # FIXME: company = self.env['res.company'].create(dados)
                 self.env['res.company'].create(dados)
 
-
     @api.model
     def create(self, dados):
         empresa = super(SpedEmpresa, self).create(dados)
         empresa.sync_to_company()
         return empresa
 
-
     @api.multi
     def write(self, dados):
         res = super(SpedEmpresa, self).write(dados)
         self.sync_to_company()
         return res
-
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -430,7 +421,6 @@ class SpedEmpresa(models.Model):
         else:
             valores.update(eh_usuario=False)
         return res
-
 
     @api.model
     @api.returns('self', lambda value: value.id if value else False)
