@@ -5,6 +5,6 @@ reportlab
 unidecode
 email_validator
 xmlsec
-https://github.com/odoo-brazil/pybrasil/archive/master.zip#egg=pybrasil
-https://github.com/odoo-brazil/geraldo/archive/master.zip#egg=geraldo
-https://github.com/odoo-brazil/PySPED/archive/master.zip#egg=PySPED
+-e git+http://github.com/odoo-brazil/pybrasil.git#egg=pybrasil
+-e git+http://github.com/odoo-brazil/geraldo.git#egg=geraldo
+-e git+http://github.com/odoo-brazil/PySPED.git#egg=PySPED
