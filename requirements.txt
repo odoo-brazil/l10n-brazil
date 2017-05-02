@@ -4,4 +4,7 @@ pillow==3.4.2
 reportlab
 unidecode
 email_validator
-xmlsec
+py3o.template==0.9.11
+sh==1.12.13
+lxml==3.7.3
+signxml==2.3.0
