@@ -23,32 +23,26 @@ class SpedBase(models.AbstractModel):
         comodel_name='res.currency',
         string='Moeda',
         compute='_compute_currency_id',
-        default=lambda self: self.env.ref('base.BRL'),
+        default=lambda self: self.env.ref('base.BRL')
     )
     currency_aliquota_id = fields.Many2one(
         comodel_name='res.currency',
         string='Percentual',
         compute='_compute_currency_id',
-        default=lambda self: self.env.ref('l10n_br_base.SIMBOLO_ALIQUOTA'),
-        context={'only_currencies': False},
-        domain=[['is_symbol', '=', True]],
+        default=lambda self: self.env.ref('l10n_br_base.SIMBOLO_ALIQUOTA')
     )
     currency_unitario_id = fields.Many2one(
         comodel_name='res.currency',
         string='Unitário',
         compute='_compute_currency_id',
         default=lambda self: self.env.ref(
-            'l10n_br_base.SIMBOLO_VALOR_UNITARIO'),
-        context={'only_currencies': False},
-        domain=[['is_symbol', '=', True]],
+            'l10n_br_base.SIMBOLO_VALOR_UNITARIO')
     )
     currency_peso_id = fields.Many2one(
         comodel_name='res.currency',
         string='Peso',
         compute='_compute_currency_id',
-        default=lambda self: self.env.ref('l10n_br_base.SIMBOLO_PESO'),
-        context={'only_currencies': False},
-        domain=[['is_symbol', '=', True]],
+        default=lambda self: self.env.ref('l10n_br_base.SIMBOLO_PESO')
     )
 
     def _compute_currency_id(self):
