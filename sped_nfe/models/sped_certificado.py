@@ -5,15 +5,18 @@
 # License AGPL-3 or later (http://www.gnu.org/licenses/agpl)
 #
 
+from __future__ import division, print_function, unicode_literals
 
 import logging
 import tempfile
+from datetime import datetime
+
 from odoo import api, fields, models
-from ...sped.constante_tributaria import (
+from odoo.addons.l10n_br_base.constante_tributaria import (
     TIPO_CERTIFICADO,
     TIPO_CERTIFICADO_A1,
 )
-from datetime import datetime
+
 _logger = logging.getLogger(__name__)
 
 try:
@@ -22,58 +25,62 @@ try:
     from pybrasil.data import formata_data
     from pybrasil.inscricao import (formata_cnpj, formata_cpf, valida_cnpj,
                                     valida_cpf)
+
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
 
-class Certificado(models.Model):
-    _description = u'Certificado Digital'
-    _name = 'sped.certificado'
+CERTIFICADOS = {}
+
+
+class SpedCertificado(models.Model):
+    _name = b'sped.certificado'
+    _description = 'Certificado Digital'
     _rec_name = 'descricao'
     _order = 'data_fim_validade desc'
 
     tipo = fields.Selection(
         selection=TIPO_CERTIFICADO,
         default=TIPO_CERTIFICADO_A1,
-        string=u'Tipo',
+        string='Tipo',
     )
     numero_serie = fields.Char(
-        string=u'Nº de série',
+        string='Nº de série',
         size=32
     )
     senha = fields.Char(
-        string=u'Senha',
+        string='Senha',
         max_length=120
     )
     proprietario = fields.Char(
-        string=u'Proprietário',
+        string='Proprietário',
         max_length=120
     )
     cnpj_cpf = fields.Char(
-        string=u'CNPJ/CPF',
+        string='CNPJ/CPF',
         size=18
     )
     data_inicio_validade = fields.Datetime(
-        string=u'Válido de'
+        string='Válido de'
     )
     data_fim_validade = fields.Datetime(
-        string=u'Válido até'
+        string='Válido até'
     )
     arquivo = fields.Binary(
-        string=u'Arquivo',
+        string='Arquivo',
         attachment=True
     )
     nome_arquivo = fields.Char(
-        string=u'Arquivo',
+        string='Arquivo',
         size=255
     )
     descricao = fields.Char(
-        string=u'Certificado digital',
+        string='Certificado digital',
         compute='_compute_descricao',
         store=False,
     )
     fora_validade = fields.Char(
-        string=u'Fora da validade?',
+        string='Fora da validade?',
         size=1,
         compute='_compute_fora_validade',
         store=False,
@@ -84,22 +91,22 @@ class Certificado(models.Model):
     def _compute_descricao(self):
         for certificado in self:
             if certificado.tipo == TIPO_CERTIFICADO_A1:
-                certificado.descricao = u'A1'
+                certificado.descricao = 'A1'
             else:
-                certificado.descricao = u'A3'
+                certificado.descricao = 'A3'
 
             if certificado.proprietario:
-                certificado.descricao += u' - ' + certificado.proprietario
+                certificado.descricao += ' - ' + certificado.proprietario
 
             if certificado.cnpj_cpf:
-                certificado.descricao += u' - ' + certificado.cnpj_cpf
+                certificado.descricao += ' - ' + certificado.cnpj_cpf
 
             if (certificado.data_inicio_validade and
                     certificado.data_fim_validade):
-                certificado.descricao += u', válido de '
+                certificado.descricao += ', válido de '
                 certificado.descricao += formata_data(
                     certificado.data_inicio_validade)
-                certificado.descricao += u' até '
+                certificado.descricao += ' até '
                 certificado.descricao += formata_data(
                     certificado.data_fim_validade)
 
@@ -132,6 +139,9 @@ class Certificado(models.Model):
     def certificado_nfe(self):
         self.ensure_one()
 
+        if self.id in CERTIFICADOS:
+            return CERTIFICADOS[self.id]
+
         arq = tempfile.NamedTemporaryFile(delete=False)
         arq.seek(0)
         arq.write(self.arquivo.decode('base64'))
@@ -142,5 +152,7 @@ class Certificado(models.Model):
         cert.senha = self.senha
 
         cert.prepara_certificado_arquivo_pfx()
+
+        CERTIFICADOS[self.id] = cert
 
         return cert

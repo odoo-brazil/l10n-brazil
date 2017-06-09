@@ -5,27 +5,28 @@
 # License AGPL-3 or later (http://www.gnu.org/licenses/agpl)
 #
 
+from __future__ import division, print_function, unicode_literals
+
 import logging
-from odoo import api, fields, models
-from ...sped.constante_tributaria import *
+
+from odoo import models
+from odoo.addons.l10n_br_base.constante_tributaria import *
 
 _logger = logging.getLogger(__name__)
 
 try:
-    from pysped.nfe import ProcessadorNFe
-    from pysped.nfe.webservices_flags import *
-    from pysped.nfe.leiaute import *
-    from pybrasil.inscricao import limpa_formatacao
-    from pybrasil.data import parse_datetime, UTC
+    from pysped.nfe.leiaute import Det_310
+    from pybrasil.valor.decimal import Decimal as D
+    from pybrasil.template import TemplateBrasil
 
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
 
-class DocumentoItem(models.Model):
+class SpedDocumentoItem(models.Model):
     _inherit = 'sped.documento.item'
 
-    def monta_nfe(self, numero_item):
+    def monta_nfe(self, numero_item, nfe):
         self.ensure_one()
 
         if self.documento_id.modelo != MODELO_FISCAL_NFE and \
@@ -54,10 +55,10 @@ class DocumentoItem(models.Model):
             else:
                 descricao = self.produto_id.nome
 
-        descricao = descricao.replace(u'—', u'-').replace(u'–', u'-')
-        descricao = descricao.replace(u'”', u'"').replace(u'“', u'"')
-        descricao = descricao.replace(u'’', u"'").replace(u'‘', u"'")
-        descricao = descricao.replace(u'—', u'-').replace(u'–', u'-')
+        descricao = descricao.replace('—', '-').replace('–', '-')
+        descricao = descricao.replace('”', '"').replace('“', '"')
+        descricao = descricao.replace('’', u"'").replace('‘', u"'")
+        descricao = descricao.replace('—', '-').replace('–', '-')
         det.prod.xProd.valor = descricao.strip()
 
         if self.produto_id.ncm_id:
@@ -158,6 +159,7 @@ class DocumentoItem(models.Model):
         #
         if ((self.documento_id.regime_tributario != REGIME_TRIBUTARIO_SIMPLES)
                 and self.cst_ipi):
+            det.imposto.IPI.cEnq.valor = self.enquadramento_ipi or '999'
             det.imposto.IPI.CST.valor = self.cst_ipi or ''
             det.imposto.IPI.vBC.valor = str(D(self.bc_ipi))
             # det.imposto.IPI.qUnid.valor = str(D(self.quantidade_tributacao))
@@ -188,23 +190,90 @@ class DocumentoItem(models.Model):
         det.imposto.II.vIOF.valor = str(D(self.vr_iof))
 
         #
-        # Aplica um template na observação do item
+        # Prepara a observação do item
         #
         infcomplementar = self.infcomplementar or ''
 
-        dados = {
+        dados_infcomplementar = {
             'nf': self.documento_id,
             'item': self,
         }
 
-        # template = Template(
-        #     infcomplementar.encode('utf-8'),
-        #     imports=template_imports,
-        #     input_encoding='utf-8',
-        #     output_encoding='utf-8',
-        #     strict_undefined=True,
-        # )
-        # infcomplementar = template.render(**dados)
+        #
+        # Crédito de ICMS do SIMPLES
+        #
+        if self.documento_id.regime_tributario == REGIME_TRIBUTARIO_SIMPLES \
+            and self.cst_icms_sn in ST_ICMS_SN_CALCULA_CREDITO:
+            if len(infcomplementar) > 0:
+                infcomplementar += '\n'
+
+            infcomplementar += 'Permite o aproveitamento de crédito de ' + \
+                'ICMS no valor de R$ ${formata_valor(item.vr_icms_sn)},' + \
+                ' correspondente à alíquota de ' + \
+                '${formata_valor(item.al_icms_sn)}%, nos termos do art. 23'+ \
+                ' da LC 123/2006;'
+
+        #
+        # Valor do IBPT
+        #
+        if self.vr_ibpt:
+            if len(infcomplementar) > 0:
+                infcomplementar += '\n'
+
+            infcomplementar += 'Valor aproximado dos tributos: ' + \
+                'R$ ${formata_valor(item.vr_ibpt)} (' + \
+                '${formata_valor(item.al_ibpt)}%) - fonte: IBPT;'
+
+        #
+        # ICMS para UF de destino
+        #
+        if nfe.infNFe.ide.idDest.valor == \
+            IDENTIFICACAO_DESTINO_INTERESTADUAL and \
+            nfe.infNFe.ide.indFinal.valor == \
+            TIPO_CONSUMIDOR_FINAL_CONSUMIDOR_FINAL and \
+            nfe.infNFe.dest.indIEDest.valor == \
+            INDICADOR_IE_DESTINATARIO_NAO_CONTRIBUINTE:
+
+            det.imposto.ICMSUFDest.vBCUFDest.valor = \
+                det.imposto.ICMS.vBC.valor
+            det.imposto.ICMSUFDest.pFCPUFDest.valor = \
+                str(D(self.al_fcp))
+            det.imposto.ICMSUFDest.pICMSUFDest.valor = \
+                str(D(self.al_interna_destino))
+            det.imposto.ICMSUFDest.pICMSInter.valor = \
+                str(D(self.al_icms_proprio))
+            det.imposto.ICMSUFDest.pICMSInterPart.valor = \
+                str(D(self.al_partilha_estado_destino))
+            det.imposto.ICMSUFDest.vFCPUFDest.valor = \
+                str(D(self.vr_fcp))
+            det.imposto.ICMSUFDest.vICMSUFDest.valor = \
+                str(D(self.vr_icms_estado_destino))
+            det.imposto.ICMSUFDest.vICMSUFRemet.valor = \
+                str(D(self.vr_icms_estado_origem))
+
+            if len(infcomplementar) > 0:
+                infcomplementar += '\n'
+
+            infcomplementar += \
+                'Partilha do ICMS de ' + \
+                '${formata_valor(item.al_interna_destino)}% recolhida ' + \
+                'conf. EC 87/2015: ' + \
+                'R$ ${formata_valor(item.vr_icms_estado_destino)} para o ' + \
+                'estado de ${nf.participante_id.estado} e ' + \
+                'R$ ${formata_valor(item.vr_icms_estado_origem)} para o ' + \
+                'estado de ${nf.empresa_id.estado}; Valor do diferencial ' + \
+                'de alíquota (${formata_valor(item.al_difal)}%): ' + \
+                'R$ ${formata_valor(item.vr_difal)};'
+
+            if self.vr_fcp:
+                infcomplementar += ' Fundo de combate à pobreza: R$ ' + \
+                    '${formata_valor(item.vr_fcp)}'
+
+        #
+        # Aplica um template na observação do item
+        #
+        template = TemplateBrasil(infcomplementar.encode('utf-8'))
+        infcomplementar = template.render(**dados_infcomplementar)
         det.infAdProd.valor = infcomplementar.decode('utf-8')
 
         return det

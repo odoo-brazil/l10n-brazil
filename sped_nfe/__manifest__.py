@@ -11,6 +11,8 @@
     'author': u'"Odoo Community Association (OCA), Ari Caldeira',
     'category': u'Base',
     'depends': [
+        'l10n_br_base',
+        'sped_imposto',
         'sped',
     ],
     'installable': True,
@@ -25,6 +27,6 @@
         'views/sped_consulta_dfe_view.xml',
     ],
     'external_dependencies': {
-        'python': ['pybrasil', 'pysped'],
+        'python': ['pybrasil', 'pysped', 'mako'],
     }
 }

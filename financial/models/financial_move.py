@@ -1,172 +1,321 @@
 # -*- coding: utf-8 -*-
 # Copyright 2017 KMEE
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+from __future__ import division, print_function, unicode_literals
+
 from datetime import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_is_zero
-
-
-FINANCIAL_MOVE = [
-    ('r', u'Account Receivable'),
-    ('p', u'Account Payable'),
-]
-
-FINANCIAL_IN_OUT = [
-    ('rr', u'Receipt'),
-    ('pp', u'Payment'),
-]
-
-FINANCIAL_TYPE = FINANCIAL_MOVE + FINANCIAL_IN_OUT
-
-FINANCIAL_STATE = [
-    ('draft', u'Draft'),
-    ('open', u'Open'),
-    ('paid', u'Paid'),
-    ('cancel', u'Cancel'),
-]
-
-FINANCIAL_SEQUENCE = {
-    'r': 'financial.move.receivable',
-    'rr': 'financial.move.receipt',
-    'p': 'financial.move.payable',
-    'pp': 'financial.move.payment',
-}
+from ..constants import *
 
 
 class FinancialMove(models.Model):
-    _name = 'financial.move'
+    _name = b'financial.move'
     _description = 'Financial Move'
-    _inherit = ['mail.thread', 'account.abstract.payment']
-    _order = "date_business_maturity desc, " \
-             "ref desc, ref_item desc, document_number, id desc"
+    _inherit = ['mail.thread']
+    _order = 'date_business_maturity desc, ' \
+             'ref desc, ref_item desc, document_number, id desc'
     _rec_name = 'ref'
 
-    date_business_maturity_search = fields.Date(
-        # string="Payment date from",
-        compute='date_business_maturity_search_filter',
+    #
+    # Move identification
+    #
+    type = fields.Selection(
+        string='Financial Type',
+        selection=FINANCIAL_TYPE,
+        required=True,
+        index=True,
+    )
+    sign = fields.Integer(
+        string='Sign',
+        compute='_compute_sign',
         store=True,
     )
-
-    date_issue_search = fields.Date(
-        # string="Payment date from",
-        compute='date_issue_search_filter',
-        store=True,
+    state = fields.Selection(
+        selection=FINANCIAL_STATE,
+        string='Status',
+        index=True,
+        readonly=True,
+        default='draft',
+        track_visibility='onchange',
+        copy=False,
     )
-
-    partner_search = fields.Many2one(
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        string='Company',
+        required=True,
+        ondelete='restrict',
+        default=lambda self: self.env.user.company_id.id,
+        index=True,
+    )
+    currency_id = fields.Many2one(
+        string='Currency',
+        comodel_name='res.currency',
+        default=lambda self: self.env.user.company_id.currency_id,
+        track_visibility='_track_visibility_onchange',
+    )
+    partner_id = fields.Many2one(
         comodel_name='res.partner',
-        compute='partner_search_filter',
-        store=True,
+        string='Partner',
+        ondelete='restrict',
+        index=True,
+    )
+    bank_id = fields.Many2one(
+        comodel_name='res.partner.bank',
+        string='Bank Account',
+        ondelete='restrict',
+        index=True,
+    )
+    document_type_id = fields.Many2one(
+        comodel_name='financial.document.type',
+        string='Document type',
+        ondelete='restrict',
+        index=True,
+        required=True,
+    )
+    document_number = fields.Char(
+        string='Document number',
+        index=True,
+        required=True,
     )
 
-    account_analytic_search = fields.Many2one(
+    #
+    # Accounting
+    #
+    journal_id = fields.Many2one(
+        comodel_name='account.journal',
+        string='Journal',
+        ondelete='restrict',
+    )
+    account_move_template_id = fields.Many2one(
+        comodel_name='financial.account.move.template',
+        string='Account move template',
+        ondelete='restrict',
+    )
+    account_type_id = fields.Many2one(
+        comodel_name='account.account.type',
+        string='Account Type',
+        ondelete='restrict',
+        index=True,
+    )
+    account_id = fields.Many2one(
+        comodel_name='account.account',
+        string='Account',
+        ondelete='restrict',
+        index=True,
+    )
+    analytic_account_id = fields.Many2one(
         comodel_name='account.analytic.account',
-        compute='account_analytic_search_filter',
+        string='Analytic account',
+        ondelete='restrict',
+        index=True,
+    )
+    account_move_id = fields.Many2one(
+        comodel_name='account.move',
+        string='Account move',
+        ondelete='restrict',
+    )
+    account_move_line_ids = fields.One2many(
+        comodel_name='account.move.line',
+        inverse_name='move_id',
+        string='Partidas do lançamento contábil',
+        related='account_move_id.line_ids',
+    )
+    payment_term_id = fields.Many2one(
+        comodel_name='account.payment.term',
+        string='Payment term',
+        track_visibility='onchange',
+        required=False,
+    )
+
+    #
+    # Move dates; there are those five date fields, controlling, respectively:
+    # date_document - when de document to which the move refers was created
+    # date_maturity - up to when the debt must be paid
+    # date_business_maturity - if date_maturity is a weekend, when banks don't
+    #    regularly open, or is on a weekday, that happens to be a holiday,
+    #    moves the *real* date_maturity to the next business day; when
+    #    controlling customers' payments' regularity, if the customer pays
+    #    his/her debt on the date_business_maturity, it must still be
+    #    considered a regular paying customer
+    # date_payment - when the debt was actually paid
+    # date_credit_debit - when *the bank* credits/debits the actual money
+    #    in/out of the bank account (in certain cases, there is a 1 or 2 day
+    #    delay between the customer payment and the actual liquidity of the
+    #    payment on the bank account
+    #
+    date_document = fields.Date(
+        string='Document date',
+        default=fields.Date.context_today,
+    )
+    date_maturity = fields.Date(
+        string='Maturity date',
+    )
+    date_business_maturity = fields.Date(
+        string='Business maturity date',
+        store=True,
+        compute='_compute_date_business_maturity'
+    )
+    date_payment = fields.Date(
+        string='Payment date',
+    )
+    date_credit_debit = fields.Date(
+        string='Credit/debit date',
+    )
+    date_cancel = fields.Date(
+        string='Cancel date',
+    )
+    date_refund = fields.Date(
+        string='Refund date',
+    )
+
+    #
+    # Move amounts
+    #
+    amount_document = fields.Monetary(
+        string='Document',
+    )
+    amount_interest = fields.Monetary(
+        string='Interest',
+    )
+    amount_penalty = fields.Monetary(
+        string='Penalty',
+    )
+    amount_other_credits = fields.Monetary(
+        string='Other credits',
+    )
+    amount_discount = fields.Monetary(
+        string='Discount',
+    )
+    amount_other_debits = fields.Monetary(
+        string='Other debits',
+    )
+    amount_bank_fees = fields.Monetary(
+        string='Bank fees',
+    )
+    amount_refund = fields.Monetary(
+        string='Refund',
+    )
+    amount_cancel = fields.Monetary(
+        string='Cancelled',
+    )
+    amount_total = fields.Monetary(
+        string='Total',
+        compute='_compute_totals',
+        store=True,
+        )
+    amount_paid = fields.Monetary(
+        string='Paid',
+        compute='_compute_residual',
+        store=True,
+        )
+    amount_residual = fields.Monetary(
+        string='Residual',
+        compute='_compute_residual',
         store=True,
     )
 
-    payment_mode_search = fields.Many2one(
-        comodel_name='account.payment.mode',
-        compute='payment_mode_search_filter',
-        store=True,
+    #
+    # Move interest and discount forecast
+    #
+    interest_rate = fields.Float(
+        string='Interest rate',
+        digits=(18,10),
+    )
+    date_interest = fields.Date(
+        string='Interest since',
+    )
+    amount_interest_forecast = fields.Monetary(
+        string='Interest forecast',
+    )
+    penalty_rate = fields.Float(
+        string='Penalty rate',
+        digits=(18,10),
+    )
+    date_penalty = fields.Date(
+        string='Penalty since',
+    )
+    amount_penalty_forecast = fields.Monetary(
+        string='Penalty forecast',
+    )
+    discount_rate = fields.Float(
+        string='Penalty rate',
+        digits=(18,10),
+    )
+    date_discount = fields.Date(
+        string='Discount up to',
+    )
+    amount_discount_forecast = fields.Monetary(
+        string='Discount forecast',
+    )
+    amount_total_forecast = fields.Monetary(
+        string='Total forecast',
     )
 
-    document_number_search = fields.Char(
-        compute='document_number_search_filter',
-        store=True,
+    #
+    # Relations to other debts and payments
+    #
+    debt_id = fields.Many2one(
+        comodel_name='financial.move',
+        string='Debt',
+        domain=[('type', 'in', (FINANCIAL_DEBT_2RECEIVE, FINANCIAL_DEBT_2PAY))]
+    )
+    payment_ids = fields.One2many(
+        comodel_name='financial.move',
+        inverse_name='debt_id',
+    )
+    # financial_payment_id = fields.Many2one(
+    #     comodel_name='financial.move',
+    # )
+
+    #
+    # Notes
+    #
+    communication = fields.Char(
+        string='Memo',
+        track_visibility='_track_visibility_onchange',
+    )
+    note = fields.Text(
+        string='Note',
+        track_visibility='_track_visibility_onchange',
     )
 
-    document_item_search = fields.Char(
-        compute='document_item_search_filter',
-        store=True,
-    )
-
-    def date_business_maturity_search_filter(self):
-        return self
-
-    def date_issue_search_filter(self):
-        return self
-
-    def partner_search_filter(self):
-        return self
-
-    def account_analytic_search_filter(self):
-        return self
-
-    def payment_mode_search_filter(self):
-        return self
-
-    def document_number_search_filter(self):
-        return self
-
-    def document_item_search_filter(self):
-        return self
-
-    def _readonly_state(self):
-        return {'draft': [('readonly', False)]}
-
-    @api.multi
-    @api.depends('ref', 'ref_item')
-    def _compute_display_name(self):
-        for record in self:
-            if record.ref_item:
-                record.display_name = record.ref + '/' + record.ref_item
+    @api.depends('type')
+    def _compute_sign(self):
+        for move in self:
+            if move.type in ['2receive', 'receipt_item', 'money_in']:
+                move.sign = 1
             else:
-                record.display_name = record.ref or ''
+                move.sign = -1
 
-    @api.multi
-    @api.depends('date_maturity')
-    def _compute_date_business_maturity(self):
-        # TODO: refactory for global OCA use
-        for record in self:
-            if record.date_maturity:
-                record.date_business_maturity = self.env[
-                    'resource.calendar'].proximo_dia_util_bancario(
-                    fields.Date.from_string(record.date_maturity))
-
-    @api.model
-    def _avaliable_transition(self, old_state, new_state):
-        allowed = [
-            ('draft', 'open'),
-            ('open', 'paid'),
-            ('open', 'cancel'),
-        ]
-        return (old_state, new_state) in allowed
-
-    @api.one
-    @api.constrains('amount')
-    def _check_amount(self):
-        if not self.amount > 0.0 and self.state not in 'cancel':
-            raise ValidationError(
-                'The payment amount must be strictly positive.')
-
-    @api.depends('amount',
-                 'amount_interest',
-                 'amount_discount',
-                 'amount_refund',
-                 'amount_cancel',
-                 )
+    @api.depends('amount_document',
+                 'amount_penalty', 'amount_interest', 'amount_other_credits',
+                 'amount_discount', 'amount_other_debits', 'amount_bank_fees',
+                 'amount_refund', 'amount_cancel')
     def _compute_totals(self):
         for record in self:
-            amount_total = (
-                record.amount +
-                record.amount_interest -
-                record.amount_discount -
-                record.amount_refund -
-                record.amount_cancel
-            )
+            amount_total = record.amount_document
+            amount_total += record.amount_interest
+            amount_total += record.amount_penalty
+            amount_total += record.amount_other_credits
+            amount_total -= record.amount_discount
+            amount_total -= record.amount_other_debits
+            amount_total -= record.amount_bank_fees
+            amount_total -= record.amount_refund
+            amount_total -= record.amount_cancel
             record.amount_total = amount_total
 
     @api.multi
     @api.depends('state', 'currency_id', 'amount_total',
-                 'related_payment_ids.amount_total')
+                 'payment_ids.amount_total')
     def _compute_residual(self):
         for record in self:
             amount_paid = 0.00
-            if record.financial_type in ('r', 'p'):
-                for payment in record.related_payment_ids:
+            if record.type in ('2receive', '2pay'):  # FIXME
+                for payment in record.payment_ids:
                     amount_paid += payment.amount_total
                 amount_residual = record.amount_total - amount_paid
                 digits_rounding_precision = record.currency_id.rounding
@@ -180,139 +329,51 @@ class FinancialMove(models.Model):
                 else:
                     record.reconciled = False
 
-    state = fields.Selection(
-        selection=FINANCIAL_STATE,
-        string=u'Status',
-        index=True,
-        readonly=True,
-        default='draft',
-        track_visibility='onchange',
-        copy=False,
-    )
-    financial_type = fields.Selection(
-        selection=FINANCIAL_TYPE,
-        required=True,
-    )
-    payment_type = fields.Selection(
-        required=False,
-    )
-    payment_method_id = fields.Many2one(
-        required=False,
-    )
-    payment_mode_id = fields.Many2one(
-        comodel_name='account.payment.mode', string="Payment Mode",
-        ondelete='restrict',
-        readonly=True, states={'draft': [('readonly', False)]})
-    payment_term_id = fields.Many2one(
-        string=u'Payment term',
-        comodel_name='account.payment.term',
-        track_visibility='onchange',
-    )
-    analytic_account_id = fields.Many2one(
-        comodel_name='account.analytic.account',
-        string=u'Analytic account'
-    )
-    account_id = fields.Many2one(
-        comodel_name='account.account',
-        string=u'Account',
-        required=True,
-        readonly=True, states={'draft': [('readonly', False)]},
-        domain=[('internal_type', '=', 'other')],
-        help="The partner account used for this invoice."
-    )
+    @api.depends('ref', 'ref_item')
+    def _compute_display_name(self):
+        for record in self:
+            if record.ref_item:
+                record.display_name = record.ref + '/' + record.ref_item
+            else:
+                record.display_name = record.ref or ''
+
+    @api.depends('date_maturity')
+    def _compute_date_business_maturity(self):
+        for move in self:
+            if move.date_maturity:
+                move.date_business_maturity = move.date_maturity
+        # # TODO: refactory for global OCA use avoiding l10n_br_resource
+        # for record in self:
+        #     if record.date_maturity:
+        #         record.date_business_maturity = self.env[
+        #             'resource.calendar'].proximo_dia_util_bancario(
+        #             fields.Date.from_string(record.date_maturity))
+
+    def _readonly_state(self):
+        return {'draft': [('readonly', False)]}
+
+    def _required_fields(self):
+        return True
+
+    def _track_visibility_onchange(self):
+        return 'onchange'
+
     ref = fields.Char(
-        string=u'Ref',
         required=True,
         copy=False,
         readonly=True,
-        states={'draft': [('readonly', False)]},
+        states='_readonly_state',
         index=True,
         default=lambda self: _('New')
     )
     ref_item = fields.Char(
-        string=u"ref item",
+        string='ref item',
         readonly=True,
-        states={'draft': [('readonly', False)]},
+        states='_readonly_state',
     )
     display_name = fields.Char(
-        string=u'Financial Reference',
+        string='Financial Reference',
         compute='_compute_display_name',
-    )
-    document_number = fields.Char(
-        string=u"Document Nº",
-        required=True,
-        readonly=True,
-        states=_readonly_state,
-        track_visibility='onchange',
-    )
-    date = fields.Date(
-        string=u'Financial date',
-        default=fields.Date.context_today,
-    )
-    date_maturity = fields.Date(
-        string=u'Maturity date',
-    )
-    date_business_maturity = fields.Date(
-        string=u'Business maturity',
-        readonly=True,
-        store=True,
-        compute='_compute_date_business_maturity'
-    )
-    date_payment = fields.Date(
-        string=u'Payment date',
-        readonly=True,
-        default=False,
-    )
-    date_credit_debit = fields.Date(
-        string=u'Credit debit date',
-        readonly=True,
-    )
-    amount_total = fields.Monetary(
-        string=u'Total',
-        readonly=True,
-        compute='_compute_totals',
-        store=True,
-        index=True
-    )
-    amount_paid = fields.Monetary(
-        string=u'Paid',
-        readonly=True,
-        compute='_compute_residual',
-        store=True,
-    )
-    amount_discount = fields.Monetary(
-        string=u'Discount',
-    )
-    amount_interest = fields.Monetary(
-        string=u'Interest',
-        readonly=True,
-        compute='compute_interest',
-    )
-    amount_refund = fields.Monetary(
-        string=u'Refund',
-        readonly=True,
-    )
-    amount_residual = fields.Monetary(
-        string=u'Residual',
-        readonly=True,
-        compute='_compute_residual',
-        store=True,
-    )
-    amount_cancel = fields.Monetary(
-        string=u'Cancel',
-        readonly=True,
-    )
-    note = fields.Text(
-        string="Note",
-        track_visibility='onchange',
-    )
-    related_payment_ids = fields.One2many(
-        comodel_name='financial.move',
-        inverse_name='financial_payment_id',
-        readonly=True,
-    )
-    financial_payment_id = fields.Many2one(
-        comodel_name='financial.move',
     )
     reconciled = fields.Boolean(
         string='Paid/Reconciled',
@@ -320,13 +381,29 @@ class FinancialMove(models.Model):
         readonly=True,
         compute='_compute_residual',
     )
-    journal_id = fields.Many2one(
-        required=False,
+    doc_source_id = fields.Reference(
+        selection=[],
+        string='Source Document',
+        readonly=True,
     )
-    bank_id = fields.Many2one(
-        'res.partner.bank',
-        string=u'Bank Account',
-    )
+
+    @api.multi
+    @api.constrains('amount')
+    def _check_amount(self):
+        for record in self:
+            if not record.amount > 0.0 and record.state not in 'cancel':
+                raise ValidationError(_(
+                    'The payment amount must be strictly positive.'
+                ))
+
+    @api.model
+    def _avaliable_transition(self, old_state, new_state):
+        allowed = [
+            ('draft', 'open'),
+            ('open', 'paid'),
+            ('open', 'cancel'),
+        ]
+        return (old_state, new_state) in allowed
 
     @api.multi
     def action_number(self):
@@ -341,22 +418,26 @@ class FinancialMove(models.Model):
                 ]) == len(sequencial_ids.ids):
                     sequencial_ids.write({
                         'ref': self.env['ir.sequence'].next_by_code(
-                            FINANCIAL_SEQUENCE[record.financial_type]) or 'New'
+                            FINANCIAL_SEQUENCE[
+                                record.type]) or 'New'
                     })
                     for i, x in enumerate(sequencial_ids):
-                        x.ref_item = i+1
+                        x.ref_item = i + 1
 
-    def _before_create(self, values):
+    def do_before_create(self, values):
         return values
 
     @api.model
     def create(self, values):
-        values = self._before_create(values)
+        values = self.do_before_create(values)
         result = super(FinancialMove, self).create(values)
-        return self._after_create(result)
+        return self.do_after_create(result, values)
 
-    def _after_create(self, result):
+    def do_after_create(self, result, values):
         return result
+
+    def do_before_write(self, values):
+        return values
 
     @api.multi
     def _write(self, vals):
@@ -372,20 +453,31 @@ class FinancialMove(models.Model):
             lambda invoice: invoice.state == 'paid').action_estorno()
         return res
 
-    @api.multi
-    def unlink(self):
+    def do_after_write(self, result, values):
+        return result
+
+    def do_before_unlink(self):
         for financial in self:
             if financial.state not in ('draft', 'cancel'):
-                if financial.document_number:
+                if financial.doc_source_id:
                     # TODO: Improve this validation!
                     raise UserError(
                         _('You cannot delete an financial move which is \n'
-                          'generated by another document \n'
-                          'try to cancel you document first'))
+                          'related to another document \n'
+                          'try to cancel the related document'))
                 raise UserError(
                     _('You cannot delete an financial move which is not \n'
                       'draft or cancelled'))
-        return super(FinancialMove, self).unlink()
+
+    @api.multi
+    def unlink(self):
+        self.do_before_unlink()
+        result = super(FinancialMove, self).unlink()
+        result = self.do_after_unlink(result)
+        return result
+
+    def do_after_unlink(self, result):
+        return result
 
     @api.multi
     def change_state(self, new_state):
@@ -393,7 +485,7 @@ class FinancialMove(models.Model):
             if record._avaliable_transition(record.state, new_state):
                 record.state = new_state
             else:
-                raise UserError(_("This state transition is not allowed"))
+                raise UserError(_('This state transition is not allowed'))
 
     @api.multi
     def action_confirm(self):
@@ -421,44 +513,46 @@ class FinancialMove(models.Model):
         for record in self:
             record.change_state('cancel')
             if record.note:
-                new_note = record.note + u'\nCancel reason: ' + reason
+                new_note = record.note + '\nCancel reason: ' + reason
             else:
-                new_note = u'Cancel reason: ' + reason
+                new_note = 'Cancel reason: ' + reason
             record.write({
                 'amount_cancel': record.amount,
                 'note': new_note
             })
 
     @staticmethod
-    def _prepare_financial_move(bank_id, company_id, currency_id,
-                                financial_type, partner_id, document_number,
-                                date, date_maturity, amount,
-                                analytic_account_id=False, account_id=False,
-                                payment_term_id=False, payment_mode_id=False,
-                                **kwargs):
+    def _prepare_financial_move(
+            date_maturity,
+            amount,
+            document_number,
+            partner_id, type, date,
+            bank_id, company_id, currency_id,
+            analytic_account_id=False, account_type_id=False,
+            payment_term_id=False,
+            **kwargs):
         return dict(
             bank_id=bank_id,
             company_id=company_id,
             currency_id=currency_id,
-            financial_type=financial_type,
+            type=type,
             partner_id=partner_id,
             document_number=document_number,
             date=date,
-            payment_mode_id=payment_mode_id,
             payment_term_id=payment_term_id,
             analytic_account_id=analytic_account_id,
-            account_id=account_id,
+            account_type_id=account_type_id,
             date_maturity=date_maturity,
             amount=amount,
             **kwargs
         )
 
     @api.multi
-    def action_view_financial(self, financial_type):
-        if financial_type == 'r':
+    def action_view_financial(self, type):
+        if type == '2receive':
             action = self.env.ref(
                 'financial.financial_receivable_act_window').read()[0]
-        else:
+        elif type == '2pay':
             action = self.env.ref(
                 'financial.financial_payable_act_window').read()[0]
         if len(self) > 1:
@@ -473,14 +567,15 @@ class FinancialMove(models.Model):
         return action
 
     def cron_interest(self):
-        if self.env['resource.calendar'].data_eh_dia_util_bancario(datetime.today()):
+        if self.env['resource.calendar'].data_eh_dia_util_bancario(
+                datetime.today()):
             record = self.search([
                 ('state', '=', 'open'),
                 ('date_business_maturity', '<', datetime.today())])
-            record.compute_interest()
+            record._compute_interest()
 
     @api.depends('payment_mode_id', 'amount', 'date_business_maturity')
-    def compute_interest(self):
+    def _compute_interest(self):
         for record in self:
             if self.env['resource.calendar']. \
                     data_eh_dia_util_bancario(datetime.today()) and record. \
@@ -497,32 +592,276 @@ class FinancialMove(models.Model):
                 delay_fee = (record.payment_mode_id.
                              delay_fee_percent / 100) * record.amount
                 record.amount_interest = interest + delay_fee
-        pass
 
-    def create_contract(self, financial_create):
-        financial_move = self.env['financial.move']
-        for record in financial_create:
-            for move in record.line_ids:
-                kargs = {}
-                values = self._prepare_financial_move(
-                    bank_id=financial_create.bank_id.id,
-                    company_id=financial_create.company_id.id,
-                    currency_id=financial_create.currency_id.id,
-                    financial_type=financial_create.financial_type,
-                    partner_id=financial_create.partner_id.id,
-                    document_number=move.document_item,
-                    date=financial_create.date,
-                    payment_mode_id=financial_create.payment_mode_id.id,
-                    payment_term_id=financial_create.payment_term_id.id,
-                    analytic_account_id=
-                    financial_create.analytic_account_id.id,
-                    account_id=financial_create.account_id.id,
-                    date_maturity=move.date_maturity,
-                    amount=move.amount,
-                    note=record.note,
-                    **kargs
-                )
-                financial = self.create(values)
-                financial.action_confirm()
-                financial_move |= financial
-        return financial_move
+    def _create_from_dict(self, move_dict):
+        '''How to use:
+
+   def _prepare_lancamento_item(self, item):
+        return {
+            'document_number':
+                '{0.serie}-{0.numero:0.0f}-{1.numero}/{2}'.format(
+                    self, item, len(self.duplicata_ids)),
+            'date_maturity': item.data_vencimento,
+            'amount': item.valor
+        }
+
+    def _prepare_lancamento_financeiro(self):
+        return {
+            'date': self.data_emissao,
+            'type': '2receive',
+            'partner_id':
+                self.participante_id and self.participante_id.partner_id.id,
+            'doc_source_id': self._name + ',' + str(self.id),
+            'bank_id': 1,
+            'company_id': self.empresa_id and self.empresa_id.company_id.id,
+            'currency_id': self.currency_id.id,
+            'payment_term_id':
+                self.payment_term_id and self.payment_term_id.id or False,
+            # 'account_type_id':
+            # 'analytic_account_id':
+            # 'payment_mode_id:
+            'lines': [self._prepara_lancamento_item(parcela)
+                      for parcela in self.duplicata_ids],
+        }
+
+    def action_financial_create(self):
+
+        p = self._prepare_lancamento_financeiro()
+        financial_move_ids = self.env['financial.move']._create_from_dict(p)
+        financial_move_ids.action_confirm()
+
+        :param move_dict:
+        :return: a record set of financial.move
+        '''
+        lines = move_dict.pop('lines')
+
+        financial_move_ids = self.env['financial.move']
+
+        for item in lines:
+            date_maturity = item.pop('date_maturity')
+            amount = item.pop('amount')
+            document_number = item.pop('document_number')
+            #
+            # Override move_dict with item data!
+            #
+            kwargs = move_dict.copy()
+            kwargs.update(item)
+
+            values = self._prepare_financial_move(
+                date_maturity=date_maturity,
+                amount=amount,
+                document_number=document_number,
+                **kwargs
+            )
+            financial = self.create(values)
+            financial_move_ids |= financial
+        return financial_move_ids
+
+    def create_account_move(self):
+        for move in self:
+            vals = {
+                'financial_move_id': move.id,
+                'ref': move.document_number,
+                'partner_id': move.partner_id.id,
+                'company_id': move.company_id.id,
+                'date': move.date_document,
+            }
+
+            #
+            # For receipts and payments, we use the configurations from
+            # the document type of their respectiv debts
+            #
+            if move.type in (FINANCIAL_RECEIPT, FINANCIAL_PAYMENT):
+                document_type = move.debt_id.document_type_id
+            else:
+                document_type = move.document_type_id
+
+            if move.journal_id:
+                vals['journal_id'] = move.journal_id.id
+            elif move.document_type_id.journal_id:
+                vals['journal_id'] = document_type.journal_id.id
+
+            if move.account_move_id:
+                if move.account_move_id.state != 'draft':
+                    # raise
+                    continue
+                account_move = move.account_move_id
+                account_move.write(vals)
+            else:
+                account_move = self.env['account.move'].create(vals)
+                move.account_move_id = account_move
+
+            line_ids = [(5, 0, {})]
+
+            move_template = None
+            if move.account_move_template_id:
+                move_template = move.account_move_template_id
+            else:
+                if move.type == FINANCIAL_DEBT_2RECEIVE and \
+                    document_type.account_move_template_2receive_id:
+                    move_template = \
+                        document_type.account_move_template_2receive_id
+
+                elif move.type == FINANCIAL_DEBT_2PAY and \
+                    document_type.account_move_template_2pay_id:
+                    move_template = \
+                        document_type.account_move_template_2pay_id
+
+                elif move.type == FINANCIAL_RECEIPT and \
+                    document_type.account_move_template_receipt_item_id:
+                    move_template = \
+                        document_type.account_move_template_receipt_item_id
+
+                elif move.type == FINANCIAL_PAYMENT and \
+                    document_type.account_move_template_payment_item_id:
+                    move_template = \
+                        document_type.account_move_template_payment_item_id
+                elif move.type == FINANCIAL_MONEY_IN and \
+                    document_type.account_move_template_money_in_id:
+                    move_template = \
+                        document_type.account_move_template_money_in_id
+                elif move.type == FINANCIAL_MONEY_OUT and \
+                    document_type.account_move_template_money_out_id:
+                    move_template = \
+                        document_type.account_move_template_money_out_id
+
+            if move_template is None:
+                #raise
+                pass
+
+            fields_already_accounted = []
+            move.create_account_move_line(account_move, move_template,
+                  line_ids, fields_already_accounted=fields_already_accounted)
+
+            account_move.write({'line_ids': line_ids})
+
+            if len(move.payment_ids) > 0:
+                move.payment_ids.create_account_move()
+
+    def create_account_move_line(self, account_move, move_template, line_ids,
+                                 fields_already_accounted=[]):
+        self.ensure_one()
+        for template_item in move_template.item_ids:
+            if not getattr(self, template_item.field, False):
+                continue
+
+            if template_item.field in fields_already_accounted:
+                continue
+
+            value = getattr(self, template_item.field, 0)
+
+            if not value:
+                continue
+
+            vals = {
+                'move_id': account_move.id,
+                'financial_move_id': self.id,
+                'name': self.document_number,
+                'narration': template_item.field,
+                'debit': value,
+                'currency_id': self.currency_id.id,
+            }
+
+            #
+            # For receipts and payments, we use the configurations from
+            # the document type of their respectiv debts
+            #
+            if self.type in (FINANCIAL_RECEIPT, FINANCIAL_PAYMENT):
+                partner = self.debt_id.partner_id
+            else:
+                partner = self.partner_id
+
+            #
+            # Default debit and credit accounts, per financial move type
+            #
+            account_debit = None
+            if template_item.account_debit_id:
+                account_debit = template_item.account_debit_id
+            else:
+                if self.type == FINANCIAL_DEBT_2RECEIVE:
+                    if partner.property_account_receivable_id:
+                        account_debit = \
+                            partner.property_account_receivable_id
+
+                elif self.type == FINANCIAL_DEBT_2PAY:
+                    account_debit = self.account_id
+
+                elif self.type == FINANCIAL_RECEIPT:
+                    if self.bank_id.account_id:
+                        account_debit = self.bank_id.account_id
+
+                elif self.type == FINANCIAL_PAYMENT:
+                    if partner.property_account_payable_id:
+                        account_debit = \
+                            partner.property_account_payable_id
+
+                elif self.type == FINANCIAL_MONEY_IN:
+                    if self.bank_id.account_id:
+                        account_debit = self.bank_id.account_id
+
+                elif self.type == FINANCIAL_MONEY_OUT:
+                    account_debit = self.account_id
+                    # if partner.property_account_payable_id
+                    #     account_debit = \
+                    #         partner.property_account_payable_id
+                    # else:
+                    #     account_debit = self.account_id
+
+            if account_debit is None:
+                # raise
+                pass
+            else:
+                vals['account_id'] = account_debit.id
+
+            line_ids.append([0, 0, vals])
+
+            vals = {
+                'move_id': account_move.id,
+                'financial_move_id': self.id,
+                'name': self.document_number,
+                'narration': template_item.field,
+                'credit': value,
+                'currency_id': self.currency_id.id,
+            }
+
+            account_credit = None
+            if template_item.account_credit_id:
+                account_credit = template_item.account_credit_id
+            else:
+                if self.type == FINANCIAL_DEBT_2RECEIVE:
+                    account_credit = self.account_id
+
+                elif self.type == FINANCIAL_DEBT_2PAY:
+                    if partner.property_account_payable_id:
+                        account_credit = \
+                            partner.property_account_payable_id
+
+                elif self.type == FINANCIAL_RECEIPT:
+                    if partner.property_account_receivable_id:
+                        account_credit = \
+                            partner.property_account_receivable_id
+
+                elif self.type == FINANCIAL_PAYMENT:
+                    if self.bank_id.account_id:
+                        account_credit = self.bank_id.account_id
+
+                elif self.type == FINANCIAL_MONEY_IN:
+                    account_credit = self.account_id
+
+                elif self.type == FINANCIAL_MONEY_OUT:
+                    if self.bank_id.account_id:
+                        account_credit = self.bank_id.account_id
+
+            if account_debit is None:
+                # raise
+                pass
+            else:
+                vals['account_id'] = account_credit.id
+
+            line_ids.append([0, 0, vals])
+
+            fields_already_accounted.append(template_item.field)
+
+        if move_template.parent_id:
+            self.create_account_move_line(account_move, move_template,
+                line_ids, fields_already_accounted=fields_already_accounted)

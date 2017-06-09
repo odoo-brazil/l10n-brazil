@@ -11,21 +11,20 @@
         <field name="arch" type="xml">
             <form string="Financial_create">
                 <group>
-                    <field name="hide_payment_method" invisible="1"/>
-                    <field name="payment_method_code" invisible="1"/>
-
                     <group>
                         <field name="financial_type"/>
                         <field name="bank_id"  options="{'no_create': True, 'no_open': True}"/>
                         <field name="currency_id" options="{'no_create': True, 'no_open': True}" groups="base.group_multi_currency"/>
-                        <field name="partner_id" domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]" attrs="{'required': [('financial_type', 'in', ('r', 'p', 'rr', 'pp'))]}" context="{'default_is_company': True, 'default_supplier': financial_type == 'p', 'default_customer': financial_type == 'r'}"/>
-                        <field name="account_id"/>
-                        <field name="analytic_account_id"/>
+                        <field name="partner_id"
+                               domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]" required="True" context="{'default_is_company': True, 'default_supplier': financial_type == '2pay', 'default_customer': financial_type == '2receive'}"/>
+                        <field name="account_type_id"/>
+                        <!--<field name="analytic_account_id"/>-->
                     </group>
                     <group>
-                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        <field name="company_id" options="{'no_create': True}"/>
                         <field name="document_number"/>
                         <field name="date"/>
+                        <field name="payment_mode_id"/>
                     </group>
                     <group>
                         <field name="payment_mode_id"/>
@@ -46,7 +45,7 @@
                     <div>
                         <field name="note" placeholder="Notes ..."/>
                     </div>
-                    </group>
+                </group>
                 <footer>
                     <button name='compute'
                         string='Compute'
@@ -70,12 +69,11 @@
         <field name="target">new</field>
     </record>
 
-
     <record model="ir.ui.menu" id="financial_create_menu">
         <field name="name">New financial move</field>
-        <field name="parent_id" ref="financial_dashboard_menu"/>
+        <field name="parent_id" ref="financial_top_menu"/>
         <field name="action" ref="financial_create_act_window"/>
-        <field name="sequence" eval="50"/>
+        <field name="sequence" eval="17"/>
     </record>
 
 </data>

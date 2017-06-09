@@ -12,7 +12,6 @@ class FinancialStatementReport(models.Model):
     _transient = False
 
     name = fields.Char(
-        string=u'Name',
         required=True,
     )
     analytic_account_id = fields.Many2one(
@@ -20,11 +19,9 @@ class FinancialStatementReport(models.Model):
         string=u'Analytic account'
     )
     date_report = fields.Datetime(
-        string=u"Date report",
         readonly=True,
     )
     report_format = fields.Selection(
-        string=u"Report format",
         selection=[
             ('pdf', u'PDF'),
             ('xls', u'XLS'),  # TODO
@@ -38,7 +35,7 @@ class FinancialStatementReport(models.Model):
     not_included_ids = fields.One2many(
         comodel_name='financial.statement.report.not_included',
         inverse_name='financial_statement_report_id',
-        string=u"Included accounts"
+        string=u"Not Included accounts"
     )
     currency_id = fields.Many2one(
         related='company_id.currency_id',
@@ -59,9 +56,10 @@ class FinancialStatementReport(models.Model):
                 res[report_id]['comp_bal'] = value['balance']
                 report_acc = res[report_id].get('account')
                 if report_acc:
-                    for account_id, val in comparison_res[report_id].get(
+                    for account_type_id, val in comparison_res[report_id].get(
                             'account').items():
-                        report_acc[account_id]['comp_bal'] = val['balance']
+                        report_acc[account_type_id][
+                            'comp_bal'] = val['balance']
 
         for report in child_reports:
             vals = {
@@ -71,7 +69,7 @@ class FinancialStatementReport(models.Model):
                 'level': bool(
                     report.style_overwrite
                 ) and report.style_overwrite or report.level,
-                'account_type': report.type or False,
+                'account_type_id': report.type or False,
                 # used to underline the financial report balances
             }
             if data['debit_credit']:
@@ -89,14 +87,16 @@ class FinancialStatementReport(models.Model):
 
             if res[report.id].get('account'):
                 sub_lines = []
-                for account_id, value in res[report.id]['account'].items():
+                for account_type_id, value in\
+                        res[report.id]['account'].items():
                     # if there are accounts to display, we add them to the
                     # lines with a level equals to their level in
                     # the COA + 1 (to avoid having them with a too low level
                     #  that would conflicts with the level of data
                     # financial reports for Assets, liabilities...)
                     flag = False
-                    account = self.env['account.account'].browse(account_id)
+                    account = self.env['account.account.type'].browse(
+                        account_type_id)
                     vals = {
                         'name': account.code + ' ' + account.name,
                         'balance': value['balance'] * report.sign or 0.0,
@@ -104,7 +104,7 @@ class FinancialStatementReport(models.Model):
                         'level': (
                             report.display_detail ==
                             'detail_with_hierarchy' and 4),
-                        'account_type': account.internal_type,
+                        'account_type_id': account.internal_type,
                     }
                     if data['debit_credit']:
                         vals['debit'] = value['debit']
@@ -133,8 +133,8 @@ class FinancialStatementReport(models.Model):
         credit, debit and balance amount computed for this record.
         If the record is of type :
                'accounts' : it's the sum of the linked accounts
-               'account_type' : it's the sum of leaf accoutns with
-           such an account_type
+               'account_type_id' : it's the sum of leaf accoutns with
+           such an account_type_id
                'account_report' : it's the amount of the related report
                'sum' : it's the sum of the children of this record (aka a
            'view' record)
@@ -152,9 +152,9 @@ class FinancialStatementReport(models.Model):
                 for value in res[report.id]['account'].values():
                     for field in fields:
                         res[report.id][field] += value.get(field)
-            elif report.type == 'account_type':
+            elif report.type == 'account_type_id':
                 # it's the sum the leaf accounts with such an account type
-                accounts = self.env['account.account'].search(
+                accounts = self.env['account.account.type'].search(
                     [('user_type_id', 'in', report.account_type_ids.ids)])
                 res[report.id]['account'] = self._compute_account_balance(
                     accounts)
@@ -199,14 +199,13 @@ class FinancialStatementReport(models.Model):
             if where_clause.strip():
                 wheres.append(where_clause.strip())
             filters = " AND ".join(wheres)
-            request = "SELECT account_id as id, " + ', '.join(
+            request = "SELECT account_type_id as id, " + ', '.join(
                 mapping.values()) + \
                 " FROM " + tables + \
-                " WHERE account_id IN %s " \
+                " WHERE account_type_id IN %s " \
                 + filters + \
-                " GROUP BY account_id"
+                " GROUP BY account_type_id"
             params = (tuple(accounts._ids),) + tuple(where_params)
-            # print request, '    ', params
             self.env.cr.execute(request, params)
             for row in self.env.cr.dictfetchall():
                 res[row['id']] = row
@@ -263,7 +262,7 @@ class ReportFinancialStatement(models.AbstractModel):
             'docs': docs,
             'time': time,
             'get_account_lines': docs.included_ids.read(
-                ['account_type', 'balance', 'type', 'name', 'level']
+                ['account_type_id', 'balance', 'type', 'name', 'level']
             ),
         }
         return self.env['report'].render(
@@ -273,21 +272,10 @@ class ReportFinancialStatement(models.AbstractModel):
 class FinancialStatementReportIncluded(models.Model):
     _name = 'financial.statement.report.included'
 
-    name = fields.Char(
-        string=u"Name",
-    )
-    type = fields.Char(
-
-    )
-    account_type = fields.Char(
-
-    )
-    level = fields.Integer(
-        string="Level"
-    )
-    # currency_id = fields.Many2one(
-    #     related='financial_statement_report_id.currency_id',
-    # )
+    name = fields.Char()
+    type = fields.Char()
+    account_type_id = fields.Char()
+    level = fields.Integer()
     balance = fields.Float(
         string=u"Amount",
         default=0.00,
@@ -302,17 +290,16 @@ class FinancialStatementReportNotIncluded(models.Model):
 
     name = fields.Char(
         string=u"Code",
-        related='account_id.code',
+        # related='account_type_id.code',
     )
-    account_id = fields.Many2one(
+    account_type_id = fields.Many2one(
         string=u"Account",
-        comodel_name='account.account',
+        comodel_name='account.account.type',
     )
     currency_id = fields.Many2one(
         related='financial_statement_report_id.currency_id',
     )
     amount = fields.Monetary(
-        string=u"Amount",
         default=0.00,
     )
     financial_statement_report_id = fields.Many2one(
