@@ -198,8 +198,8 @@ class HrContract(models.Model):
                 ('contract_id', '=', contrato.id),
                 ('tipo_de_folha', '=', 'ferias'),
                 ('is_simulacao', '=', False),
-                ('state', 'in', ['done', 'verify']),
-                ('date_from', '<=', hoje)
+                ('state', '!=', 'cancel'),
+                # ('date_from', '<=', hoje),
             ]
             holerites_ids = \
                 self.env['hr.payslip'].search(domain, order='date_from')
