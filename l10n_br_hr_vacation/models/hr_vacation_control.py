@@ -314,7 +314,7 @@ não do mês civil.
             dias = parse_datetime(date_end).date() - primeiro_dia_ultimo_mes
 
             dias_mes = ultimo_dia_ultimo_mes - primeiro_dia_ultimo_mes
-            if dias > timedelta(days=15):
+            if dias < timedelta(days=15):
                 avos_ultimo_mes = 1
             elif dias == timedelta(days=15):
                 if dias_mes != timedelta(days=30):
