@@ -309,12 +309,15 @@ não do mês civil.
 
             ultimo_dia_ultimo_mes = ultimo_dia_mes(date_end)
 
-            # calcular dias tarbalhados no ultimo mes apartir do aniversario
+            # calcular dias trabalhados no ultimo mes a partir do aniversario
             # do periodo aquisitivo
             dias = parse_datetime(date_end).date() - primeiro_dia_ultimo_mes
 
             dias_mes = ultimo_dia_ultimo_mes - primeiro_dia_ultimo_mes
-            if dias < timedelta(days=15):
+
+            if dias > timedelta(days=15):
+                # Se trabalhou mais do que 15 dias no ultimo mes do
+                # periodo aquisitvo, pagar avos na rescisao
                 avos_ultimo_mes = 1
             elif dias == timedelta(days=15):
                 if dias_mes != timedelta(days=30):
