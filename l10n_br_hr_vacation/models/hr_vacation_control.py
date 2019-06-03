@@ -302,8 +302,7 @@ não do mês civil.
             primeiro_dia_ultimo_mes = False
             while not primeiro_dia_ultimo_mes:
                 try:
-                    primeiro_dia_ultimo_mes = primeiro_dia_mes(date_end).\
-                        replace(day=dia_aniversario_periodo_aquisitivo)
+                    primeiro_dia_ultimo_mes = primeiro_dia_mes(date_end)
                 except ValueError:
                     dia_aniversario_periodo_aquisitivo += -1
 
