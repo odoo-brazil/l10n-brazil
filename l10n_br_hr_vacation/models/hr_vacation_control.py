@@ -227,6 +227,9 @@ class HrVacationControl(models.Model):
             else:
                 date_end = record.fim_aquisitivo
 
+            if record.contract_id.date_end and record.contract_id.date_end <= record.fim_aquisitivo:
+                date_end = record.contract_id.date_end
+
             date_end = fields.Date.from_string(date_end) + \
                        relativedelta(days=1)
             date_end = fields.Date.to_string(date_end)
