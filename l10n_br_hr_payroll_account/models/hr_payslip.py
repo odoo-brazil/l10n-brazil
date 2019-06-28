@@ -139,6 +139,21 @@ class L10nBrHrPayslip(models.Model):
                 self.env['account.event'].create(account_event)
 
     @api.multi
+    def hr_verify_sheet(self):
+        """
+        Gerar contabilizacao de holerites esoecificos
+        """
+        for holerite_id in self:
+            super(L10nBrHrPayslip, self).hr_verify_sheet()
+
+            # Holerite fora do lote, gerar evento contabil individual
+            if holerite_id.tipo_de_folha in ['ferias', 'rescisao']:
+                # Excluir se existir evento contabil
+                holerite_id.account_event_id.unlink()
+                # Gerar novo evento contabil
+                holerite_id.processar_contabilizacao_folha()
+
+    @api.multi
     def gerar_codigo_contabilizacao(self):
         """
         Se o lote ja tiver sido processado, os códigos contabeis das rubricas
