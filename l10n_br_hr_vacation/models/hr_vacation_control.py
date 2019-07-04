@@ -237,15 +237,17 @@ class HrVacationControl(models.Model):
             #
             # Calcula os avos
             #
-            if date_end:
-                ultimo_dia_primeiro_mes = fields.Date.from_string(date_end)
-            else:
+            ultimo_dia_primeiro_mes = ultimo_dia_mes(date_begin)
+
+            # Se rescisao menor que o ultimo dia do mês
+            if fields.Date.from_string(date_end) < ultimo_dia_mes(date_begin):
                 ultimo_dia_primeiro_mes = ultimo_dia_mes(date_begin)
 
             # Se no primeiro mes trabalhou mais do que 14 dias contabilizar avo
-            if ultimo_dia_primeiro_mes - \
-                    parse_datetime(date_begin).date() >= \
-                    timedelta(days=14):
+            dias_trabalhados_primeiro_mes = \
+                ultimo_dia_primeiro_mes - parse_datetime(date_begin).date()
+
+            if dias_trabalhados_primeiro_mes >= timedelta(days=14):
                 avos_primeiro_mes = 1
             else:
                 avos_primeiro_mes = 0
