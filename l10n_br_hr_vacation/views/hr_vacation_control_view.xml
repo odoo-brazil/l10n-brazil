@@ -34,6 +34,7 @@
                                 <field name="pagamento_dobro"/>
                                 <field name="dias_pagamento_dobro"/>
                                 <field name="perdido_afastamento"/>
+                                <field name="avos_pendentes" />
                             </tree>
                         </field>
                         <button name="action_button_update_controle_ferias"

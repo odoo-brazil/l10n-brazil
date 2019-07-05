@@ -69,7 +69,7 @@ class HrVacationControl(models.Model):
     )
 
     saldo = fields.Float(
-        string=u'Saldo',
+        string=u'Saldo de dias',
         help=u'Saldo dos dias de direitos proporcionalmente aos avos ja '
              u'trabalhados no periodo aquisitivo',
         compute='_compute_calcular_saldo_dias',
@@ -88,8 +88,13 @@ class HrVacationControl(models.Model):
     )
 
     avos = fields.Integer(
-        string=u'Avos',
+        string=u'Avos de direito',
         compute='_compute_calcular_avos',
+    )
+
+    avos_pendentes = fields.Float(
+        string=u'Avos Pendentes',
+        compute='_compute_calcular_avos_pendentes',
     )
 
     proporcional = fields.Boolean(
@@ -211,6 +216,10 @@ class HrVacationControl(models.Model):
             dias_de_direito = 24
         dias_de_direito -= self.dias_gozados_anteriormente
         return dias_de_direito
+
+    def _compute_calcular_avos_pendentes(self):
+        for record in self:
+            record.avos_pendentes = record.saldo / 2.5
 
     def _compute_calcular_avos(self):
         for record in self:
