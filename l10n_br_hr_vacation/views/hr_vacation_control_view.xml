@@ -16,25 +16,25 @@
                             <tree string="Férias" decoration-muted="inicio_gozo == False">
                                 <field name="inicio_aquisitivo" widget="date"/>
                                 <field name="fim_aquisitivo" widget="date"/>
-                                <field name="inicio_concessivo" widget="date"/>
-                                <field name="fim_concessivo" widget="date"/>
+                                <field name="inicio_concessivo" widget="date" invisible="1"/>
+                                <field name="fim_concessivo" widget="date" invisible="1"/>
                                 <field name="inicio_gozo" widget="date"/>
                                 <field name="fim_gozo" widget="date"/>
-                                <field name="data_aviso" widget="date"/>
-                                <field name="limite_gozo" widget="date"/>
-                                <field name="limite_aviso" widget="date"/>
-                                <field name="faltas"/>
-                                <field name="afastamentos"/>
-                                <field name="dias"/>
-                                <field name="dias_gozados"/>
-                                <field name="saldo"/>
-                                <field name="avos"/>
-                                <field name="proporcional"/>
-                                <field name="vencida"/>
-                                <field name="pagamento_dobro"/>
-                                <field name="dias_pagamento_dobro"/>
-                                <field name="perdido_afastamento"/>
+                                <field name="data_aviso" widget="date" invisible="1"/>
+                                <field name="limite_gozo" widget="date" />
+                                <field name="limite_aviso" widget="date" invisible="1"/>
+                                <field name="faltas" invisible="1"/>
+                                <field name="afastamentos" invisible="1"/>
+                                <field name="avos" invisible="1"/>
+                                <field name="dias" />
+                                <field name="dias_gozados" />
+                                <field name="saldo" />
                                 <field name="avos_pendentes" />
+                                <field name="proporcional" invisible="1"/>
+                                <field name="vencida" invisible="1"/>
+                                <field name="pagamento_dobro" invisible="1"/>
+                                <field name="dias_pagamento_dobro" invisible="1"/>
+                                <field name="perdido_afastamento" invisible="1"/>
                             </tree>
                         </field>
                         <button name="action_button_update_controle_ferias"
