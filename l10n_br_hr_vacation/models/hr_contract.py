@@ -199,8 +199,13 @@ class HrContract(models.Model):
                 ('tipo_de_folha', '=', 'ferias'),
                 ('is_simulacao', '=', False),
                 ('state', '!=', 'cancel'),
-                # ('date_from', '<=', hoje),
             ]
+
+            # Quando na execucao tiver uma data de referencia (provisoes de
+            # férias) buscar as férias até a data de referencia somente
+            if recalculo:
+                domain.append(('date_from', '<=', hoje))
+
             holerites_ids = \
                 self.env['hr.payslip'].search(domain, order='date_from')
 
