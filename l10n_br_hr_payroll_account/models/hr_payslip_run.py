@@ -156,23 +156,26 @@ class L10nBrHrPayslip(models.Model):
 
             for holerite_id in record.slip_ids + record.payslip_rescisao_ids:
 
-                fgts_total = holerite_id.line_ids.filtered(
+                inss_total = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'INSS_EMPRESA_TOTAL').total
 
-                fgts_salario = holerite_id.line_ids.filtered(
+                inss_ferias = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'INSS_EMPRESA_F_FERIAS').total or 0.0
 
-                fgts_salario_diretor = holerite_id.line_ids.filtered(
+                inss_salario_funcionario = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'INSS_EMPRESA_F_SALARIO').total or 0.0
 
-                inss_empresa_salario_diretor = holerite_id.line_ids.filtered(
+                inss_salario_13 = holerite_id.line_ids.filtered(
+                    lambda x: x.code == 'INSS_EMPRESA_F_13').total or 0.0
+
+                inss_salario_diretor = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'INSS_EMPRESA_D_SALARIO').total or 0.0
 
-                fgts_somado = \
-                    fgts_salario + fgts_salario_diretor + \
-                    inss_empresa_salario_diretor
+                inss_somado = \
+                    inss_ferias + inss_salario_funcionario + \
+                    inss_salario_diretor + inss_salario_13
 
-                if round(fgts_total, 2) != round(fgts_somado, 2):
+                if round(inss_total, 2) != round(inss_somado, 2):
                     invalidos += holerite_id.contract_id.display_name + '\n'
 
             if invalidos:
