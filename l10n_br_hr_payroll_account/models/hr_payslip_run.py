@@ -117,7 +117,7 @@ class L10nBrHrPayslip(models.Model):
         for record in self:
             invalidos = ''
 
-            for holerite_id in record.slip_ids:
+            for holerite_id in record.slip_ids + record.payslip_rescisao_ids:
 
                 fgts_total = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'FGTS').total
@@ -150,7 +150,7 @@ class L10nBrHrPayslip(models.Model):
         for record in self:
             invalidos = ''
 
-            for holerite_id in record.slip_ids:
+            for holerite_id in record.slip_ids + record.payslip_rescisao_ids:
 
                 fgts_total = holerite_id.line_ids.filtered(
                     lambda x: x.code == 'INSS_EMPRESA_TOTAL').total
