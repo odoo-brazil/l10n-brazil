@@ -35,7 +35,8 @@ class L10nBrHrPayslip(models.Model):
         super(L10nBrHrPayslip, self).close_payslip_run()
         self.gerar_contabilizacao_lote()
 
-        if self.tipo_de_folha in ['provisao_decimo_terceiro', 'provisao_ferias']:
+        if self.tipo_de_folha in \
+                ['provisao_decimo_terceiro', 'provisao_ferias']:
 
             hr_payslip_run_id = self.search([
                 ('mes_do_ano','=', self.mes_do_ano - 1),
@@ -43,7 +44,8 @@ class L10nBrHrPayslip(models.Model):
             ])
 
             if hr_payslip_run_id.account_event_id:
-                hr_payslip_run_id.account_event_id.button_reverter_lancamentos()
+                hr_payslip_run_id.account_event_id.\
+                    button_reverter_lancamentos()
 
     @api.multi
     def gerar_rubricas_para_lancamentos_contabeis_lote(self):
@@ -66,7 +68,8 @@ class L10nBrHrPayslip(models.Model):
 
                 if code in all_rubricas:
                     # Somar rubrica do holerite ao dict totalizador
-                    valor_total = all_rubricas.get(code)[2].get('valor') + valor
+                    valor_total = \
+                        all_rubricas.get(code)[2].get('valor') + valor
                     all_rubricas.get(code)[2].update(valor=valor_total)
                     line_id = \
                         rubrica_holerite[2].get('hr_payslip_line_id')[0][1]
@@ -97,7 +100,8 @@ class L10nBrHrPayslip(models.Model):
                 'origem': '{},{}'.format('hr.payslip.run', lote.id),
             }
 
-            lote.account_event_id = self.env['account.event'].create(contabiliz)
+            lote.account_event_id =\
+                self.env['account.event'].create(contabiliz)
 
     @api.multi
     def gerar_codigo_contabilizacao(self):
@@ -172,4 +176,5 @@ class L10nBrHrPayslip(models.Model):
                     invalidos += holerite_id.contract_id.display_name + '\n'
 
             if invalidos:
-                raise Warning('INSS EMPRESA inválido para:\n{}'.format(invalidos))
+                raise Warning(
+                    'INSS EMPRESA inválido para:\n{}'.format(invalidos))
