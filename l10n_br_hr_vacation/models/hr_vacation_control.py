@@ -92,6 +92,10 @@ class HrVacationControl(models.Model):
         compute='_compute_calcular_avos',
     )
 
+    avo_manual = fields.Integer(
+        string=u'Forçar quantidade de avos',
+    )
+
     avos_pendentes = fields.Float(
         string=u'Avos Pendentes',
         compute='_compute_calcular_avos_pendentes',
@@ -353,9 +357,12 @@ não do mês civil.
             # mais que 12 avos em um só período, mas deverá ser corrigido
             # por uma correção definitiva.
             if avos > 12:
-                avos = 12;
+                avos = 12
 
             record.avos = avos
+
+            if record.avo_manual:
+                record.avos = record.avo_manual
 
             # avos_decimal = (date_end - date_begin).days / 30.0
             # decimal = avos_decimal - int(avos_decimal)

@@ -78,6 +78,7 @@
                             <field name="saldo"/>
                             <field name="dias_gozados"/>
                             <field name="avos"/>
+                            <field name="avo_manual" groups='base.group_no_one' />
                         </group>
                         <group>
                             <field name="proporcional"/>
