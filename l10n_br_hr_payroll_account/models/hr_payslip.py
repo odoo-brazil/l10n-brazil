@@ -147,7 +147,8 @@ class L10nBrHrPayslip(models.Model):
             super(L10nBrHrPayslip, self).hr_verify_sheet()
 
             # Holerite fora do lote, gerar evento contabil individual
-            if holerite_id.tipo_de_folha in ['ferias', 'rescisao']:
+            if holerite_id.tipo_de_folha in \
+                    ['ferias', 'rescisao', 'rescisao_complementar']:
                 # Excluir se existir evento contabil
                 holerite_id.account_event_id.unlink()
                 # Gerar novo evento contabil
