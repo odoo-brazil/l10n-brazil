@@ -33,10 +33,9 @@ class L10nBrHrPayslip(models.Model):
         """
         # Holerite que esta sendo processado
         holerite_id = self.browse(payslip_id)
-        contract_id = holerite_id.contract_id
         salary_rule_obj = self.env['hr.salary.rule']
         rubricas_especificas = \
-            holerite_id.get_contract_specific_rubrics(contract_id, [])
+            holerite_id.get_contract_specific_rubrics([])
 
         # rubricas processadas pelo holerite
         result = super(L10nBrHrPayslip, self).get_payslip_lines(payslip_id)
@@ -67,8 +66,8 @@ class L10nBrHrPayslip(models.Model):
                 codigo_contabil = payslip_line.get('code')
 
             # Adicionar o sufixo para contabilização definido no contrato
-            if contract_id.sufixo_code_account:
-                codigo_contabil += contract_id.sufixo_code_account
+            if holerite_id.contract_id.sufixo_code_account:
+                codigo_contabil += holerite_id.contract_id.sufixo_code_account
             payslip_line.update(codigo_contabil=codigo_contabil)
 
         return result
