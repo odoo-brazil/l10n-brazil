@@ -34,8 +34,6 @@ class L10nBrHrPayslip(models.Model):
         # Holerite que esta sendo processado
         holerite_id = self.browse(payslip_id)
         salary_rule_obj = self.env['hr.salary.rule']
-        rubricas_especificas = \
-            holerite_id.get_contract_specific_rubrics([])
 
         # rubricas processadas pelo holerite
         result = super(L10nBrHrPayslip, self).get_payslip_lines(payslip_id)
@@ -50,11 +48,6 @@ class L10nBrHrPayslip(models.Model):
             # Se nao gerar contabilizacao pula a rubrica
             if not hr_salary_rule_id.gerar_contabilizacao:
                 continue
-
-            if rule_id in rubricas_especificas:
-                # verificar codigo contabil definido na rubrica especifica
-                codigo_contabil = \
-                    rubricas_especificas.get(rule_id)[0].codigo_contabil
 
             # buscar diretamente na configuracao da rubrica
             if not codigo_contabil:
