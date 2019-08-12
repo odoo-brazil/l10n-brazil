@@ -9,10 +9,10 @@ from openerp import api, models, fields
 from openerp.exceptions import Warning
 
 NOME_LANCAMENTO_LOTE = {
-    'provisao_ferias': u'Provisão de Férias em Lote',
-    'adiantamento_13': u'Décimo Terceiro Salário em Lote',
-    'decimo_terceiro': u'Décimo Terceiro Salário em Lote',
-    'provisao_decimo_terceiro': u'Provisão de 13 em Lote',
+    'provisao_ferias': u'Provisão de Férias',
+    'adiantamento_13': u'Décimo Terceiro Salário',
+    'decimo_terceiro': u'Décimo Terceiro Salário',
+    'provisao_decimo_terceiro': u'Provisão de 13º',
     'normal': u'Folha normal',
 }
 
@@ -83,8 +83,11 @@ class L10nBrHrPayslip(models.Model):
             contabiliz = {
                 'account_event_line_ids': rubricas,
                 'data': lote.data_de_pagamento or fields.Date.today(),
-                'ref': 'Lote de {}'.format(
-                    NOME_LANCAMENTO_LOTE.get(lote.tipo_de_folha)),
+                'tipo': lote.tipo_de_folha,
+                'company_id': lote.company_id.id,
+                'ref': '{} - {:02}/{}'.format(
+                    NOME_LANCAMENTO_LOTE.get(lote.tipo_de_folha),
+                    lote.mes_do_ano, lote.ano),
                 'origem': '{},{}'.format('hr.payslip.run', lote.id),
             }
 
