@@ -171,3 +171,10 @@ class L10nBrHrPayslip(models.Model):
                 if line_id.slip_id.contract_id.sufixo_code_account:
                     line_id.codigo_contabil += \
                         line_id.slip_id.contract_id.sufixo_code_account
+
+    @api.multi
+    def unlink(self):
+        for payslip in self:
+            if payslip.account_event_id:
+                payslip.account_event_id.unlink()
+        return super(L10nBrHrPayslip, self).unlink()
