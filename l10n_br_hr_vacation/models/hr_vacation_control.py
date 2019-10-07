@@ -201,14 +201,53 @@ class HrVacationControl(models.Model):
         }
 
     def _compute_calcular_faltas(self):
+        """
+        Calcular a quantidade de faltas que irao pro cálculo de dias de
+        direito em férias
+        :return:
+        """
         for record in self:
-            employee_id = record.contract_id.employee_id.id
-            leaves = self.env['hr.holidays'].get_ocurrences(
-                employee_id,
-                record.inicio_aquisitivo,
-                record.fim_aquisitivo
-            )
-            record.faltas = leaves['quantidade_dias_faltas_nao_remuneradas']
+
+            qtd_desconto_ferias = 0
+
+            domain = [
+                ('state', '=', 'validate'),
+                ('employee_id', '=', record.contract_id.employee_id.id),
+                ('type', '=', 'remove'),
+            ]
+
+            clause_1 = [
+                ('data_inicio', '>=', record.inicio_aquisitivo),
+                ('data_inicio', '<=', record.fim_aquisitivo)]
+            holidays_1_ids = self.env['hr.holidays'].search(domain + clause_1)
+
+            clause_2 = [('data_fim', '>=', record.inicio_aquisitivo),
+                        ('data_fim', '<=', record.fim_aquisitivo)]
+            holidays_2_ids = self.env['hr.holidays'].search(domain + clause_2)
+
+            for leave in holidays_1_ids | holidays_2_ids:
+
+                data_referencia = fields.Datetime.from_string(leave.data_inicio)
+                data_fim_holidays = fields.Datetime.from_string(leave.data_fim)
+
+                while data_referencia <= data_fim_holidays:
+
+                    inicio = \
+                        fields.Datetime.from_string(record.inicio_aquisitivo)
+                    fim = fields.Datetime.from_string(record.fim_aquisitivo)
+
+                    if data_referencia >= inicio and data_referencia <= fim :
+                        if leave.holiday_status_id.descontar_ferias:
+                            # Levar em consideração o tipo de dias
+                            if leave.holiday_status_id.type_day == 'uteis':
+                                rc = self.env['resource.calendar']
+                                if rc.data_eh_dia_util(data_referencia):
+                                    qtd_desconto_ferias += 1
+                            else:
+                                qtd_desconto_ferias += 1
+                    data_referencia += timedelta(days=1)
+
+            record.faltas = qtd_desconto_ferias
 
     def dias_de_direito(self):
         dias_de_direito = 30
