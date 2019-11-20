@@ -112,7 +112,7 @@ class HrContract(models.Model):
             # Se estiver reativando o contrato, isto é, removendo a data de
             # demissão
             #
-            if not contrato.date_end:
+            if not contrato.date_end and contrato.vacation_control_ids:
                 vc_obj = contrato.vacation_control_ids
                 inicio_aquisit = \
                     contrato.vacation_control_ids[0].inicio_aquisitivo
