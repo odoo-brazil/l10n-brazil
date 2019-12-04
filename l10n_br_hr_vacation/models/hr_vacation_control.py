@@ -446,7 +446,8 @@ não do mês civil.
         """
         vacation_id = self.env.ref(
             'l10n_br_hr_holiday.holiday_status_vacation').id
-        holiday_id = self.env['hr.holidays'].create({
+
+        vals = {
             'name': 'Periodo Aquisitivo: %s ate %s'
                     % (self.inicio_aquisitivo,
                        self.fim_aquisitivo),
@@ -461,8 +462,11 @@ não do mês civil.
             'number_of_days_temp': 30,
             'controle_ferias': [(6, 0, [self.id])],
             'controle_ferias_ids': [(6, 0, [self.id])],
-        })
-        holiday_id.message_follower_ids = False
+        }
+
+        holiday_id = self.env['hr.holidays'].\
+            with_context(mail_notrack=True).create(vals)
+
         holiday_id.state = 'validate'
 
         return holiday_id
