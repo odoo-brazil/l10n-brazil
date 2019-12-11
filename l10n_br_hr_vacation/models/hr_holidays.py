@@ -108,6 +108,7 @@ class HrHolidays(models.Model):
              u'saldo_disponivel - dias selecionados.\n Se o resultado for '
              u'positivo, o pedido de férias é regular e ja poderá ser gozado.',
         compute='_compute_verificar_regularidade',
+        compute_sudo=True,
     )
     saldo_periodo_referencia = fields.Float(
         string='Saldo do período aquisitivo',
@@ -116,6 +117,7 @@ class HrHolidays(models.Model):
              u'aquisitivos que tem saldo para gozar férias.',
         compute='compute_saldo_periodo_referencia',
         store=True,
+        compute_sudo=True,
     )
     regular = fields.Boolean(
         string=u'Regular',
