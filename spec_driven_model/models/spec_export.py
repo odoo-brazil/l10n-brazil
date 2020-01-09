@@ -36,11 +36,7 @@ class AbstractSpecMixin(models.AbstractModel):
 
     def _build_generateds(self, class_item=False):
         if not class_item:
-            if hasattr(self, '_stacked'):
-                class_item = self._stacked
-            else:
-                class_item = self._name
-
+            class_item = self._name
         class_obj = self.env[class_item]
         xml_required_fields = []
         for item in self.env[class_item]._fields:
@@ -60,9 +56,6 @@ class AbstractSpecMixin(models.AbstractModel):
             # print(xml_required_field)
             # print(self._fields[xml_required_field].type)
 
-            if not self[xml_required_field]:  # FIXME: and class_obj._field_prefix:
-                continue
-
             # FIXME: xml_required_field.replace(class_obj._field_prefix, '')
             field_spec_name = xml_required_field.replace('nfe40_', '')
             member_spec = ds_class_sepc[field_spec_name]
@@ -71,10 +64,15 @@ class AbstractSpecMixin(models.AbstractModel):
             if self._fields[xml_required_field].type == 'many2one':
                 if not self._fields[xml_required_field]._attrs.get('original_spec_model'):
                     continue
-                field_data = self[xml_required_field]._build_generateds(
-                    class_item=self._fields[xml_required_field]._attrs.get('original_spec_model')
-                )
+
+                if self._fields[xml_required_field]._attrs.get('original_spec_model'):
+                    field_data = self[xml_required_field]._build_generateds(
+                        class_item=self._fields[xml_required_field]._attrs.get('original_spec_model')
+                    )
+                else:
+                    field_data = self[xml_required_field]._build_generateds()
             elif self._fields[xml_required_field].type == 'one2many':
+                continue
                 relational_data = []
                 for relational_field in self[xml_required_field]:
                     relational_data.append(
@@ -92,6 +90,8 @@ class AbstractSpecMixin(models.AbstractModel):
                 else:
                     raise NotImplementedError
             else:
+                if not self[xml_required_field]:
+                    continue
                 field_data = self[xml_required_field]
 
             kwargs[field_spec_name] = field_data
@@ -113,13 +113,20 @@ class AbstractSpecMixin(models.AbstractModel):
         print(contents)
 
     def export_xml(self):
-        if hasattr(self, '_stacked'):
-            ds_object = self._build_generateds()
-            self._print_xml(ds_object)
-        else:
-            spec_classes = self._get_spec_classes()
-            ds_objects = []
-            for class_item in spec_classes:
-                ds_object = self._build_generateds(class_item)
-                self._print_xml(ds_object)
-                ds_objects.append(ds_object)
+        for record in self:
+            #
+            # Gera todos os specs do modelo e agrupa-o no modelo stacked
+            #
+            if hasattr(record, '_stacked'):
+                ds_object = record._build_generateds()
+                record._print_xml(ds_object)
+            else:
+                #
+                # Gera todos os specs do modelo separadamente
+                #
+                spec_classes = record._get_spec_classes()
+                ds_objects = []
+                for class_item in spec_classes:
+                    ds_object = record._build_generateds(class_item)
+                    record._print_xml(ds_object)
+                    ds_objects.append(ds_object)
