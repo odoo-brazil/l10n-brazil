@@ -12,6 +12,7 @@ from ..constants.fiscal import (
    TAX_DOMAIN_II, TAX_DOMAIN_PIS, TAX_DOMAIN_PIS_ST, TAX_DOMAIN_COFINS,
    TAX_DOMAIN_COFINS_ST, CFOP_DESTINATION
 )
+from ..constants.icms import ICMS_BASE_TYPE
 
 from .tax import TAX_DICT_VALUES
 
@@ -169,9 +170,12 @@ class DocumentFiscalLineMixin(models.AbstractModel):
         domain="[('cst_type', '=', operation_type),"
                "('tax_domain', '=', 'icms')]")
 
-    icms_base = fields.Monetary(
-        string="ICMS Base",
-        default=0.00)
+    icms_base_type = fields.Selection(
+        selection=ICMS_BASE_TYPE,
+        string="ICMS Base Type",
+    )
+
+    icms_base = fields.Monetary(string="ICMS Base")
 
     icms_percent = fields.Float(
         string="ICMS %",
@@ -561,7 +565,7 @@ class DocumentFiscalLineMixin(models.AbstractModel):
 
         # Reset Taxes
         self._remove_all_fiscal_tax_ids()
-        
+
         if self.operation_line_id:
 
             mapping_result = self.operation_line_id.map_fiscal_taxes(
