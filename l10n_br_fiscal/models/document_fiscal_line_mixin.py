@@ -173,6 +173,7 @@ class DocumentFiscalLineMixin(models.AbstractModel):
     icms_base_type = fields.Selection(
         selection=ICMS_BASE_TYPE,
         string="ICMS Base Type",
+        default='0',
     )
 
     icms_base = fields.Monetary(string="ICMS Base")
