@@ -32,3 +32,11 @@ class DocumentLine(models.Model):
         string="ICMS Base Type",
         default=ICMS_BASE_TYPE_DEFAULT,
     )
+
+    def _onchange_all(self):
+        self._onchange_product_id()
+        self._onchange_commercial_quantity()
+        self._onchange_ncm_id()
+        self._onchange_operation_id()
+        self._onchange_operation_line_id()
+        self._onchange_fiscal_taxes()

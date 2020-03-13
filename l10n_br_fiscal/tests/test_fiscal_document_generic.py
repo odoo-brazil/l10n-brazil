@@ -674,3 +674,16 @@ class TestFiscalDocumentGeneric(TransactionCase):
                 "Error to mapping CST 49 Outras Operações de Saída"
                 " from COFINS Simples Nacional for Venda de"
                 " Simples Nacional Fora do Estado.")
+
+    def test_nfe_return(self):
+        """ Test Fiscal Document Return """
+
+        action = self.nfe_same_state.action_create_return()
+        return_id = self.nfe_same_state.browse(
+            [i[2] for i in action['domain'] if i[0] == 'id'])
+
+        self.assertEquals(
+            return_id.operation_id.id,
+            self.nfe_same_state.operation_id.return_operation_id.id,
+            "Error on creation return"
+        )
