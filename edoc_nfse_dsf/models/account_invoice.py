@@ -93,6 +93,9 @@ class AccountInvoice(models.Model):
             inscricao_tomador = \
                 punctuation_rm(self.partner_id.inscr_mun or '') or None
 
+        itens = []
+        deducoes = []
+
         lista_rps.append(
             tpRPS(
                 Id='rps' + str(numero_rps),
@@ -102,8 +105,8 @@ class AccountInvoice(models.Model):
                 TipoRPS='RPS',
                 SerieRPS='NF',
                 NumeroRPS=int(numero_rps),
-                DataEmissaoRPS=dh_emi,
-                SituacaoRPS='N',
+                DataEmissaoRPS=dh_emi, # AAAA-MM-DDTHH:MM:SS
+                SituacaoRPS='N', # Situação RPS “N”-Normal“C”-Cancelada
                 # SerieRPSSubstituido=None,
                 # NumeroRPSSubstituido=None,
                 # NumeroNFSeSubstituida=None,
@@ -147,25 +150,8 @@ class AccountInvoice(models.Model):
                 # TelefoneTomador=self.partner_id.phone and self.partner_id.phone[:2] or None,
                 # MotCancelamento=None,
                 # CPFCNPJIntermediario=None,
-                Deducoes=tpDeducoes(
-                    DeducaoPor=None,
-                    TipoDeducao=None,
-                    # CPFCNPJReferencia=None,
-                    # NumeroNFReferencia=None,
-                    # ValorTotalReferencia=None,
-                    PercentualDeduzir=None,
-                    ValorDeduzir=None
-                ),
-                Itens=tpItens(
-                    DiscriminacaoServico=normalize(
-                        'NFKD', unicode(
-                            self.invoice_line_ids[0].name[:120] or '')
-                        ).encode('ASCII', 'ignore'),
-                    Quantidade=1,
-                    ValorUnitario=None,
-                    ValorTotal=None,
-                    Tributavel=None
-                )
+                Deducoes=deducoes,
+                Itens=itens
             )
         )
         lote_rps = ReqEnvioLoteRPS(
@@ -185,4 +171,28 @@ class AccountInvoice(models.Model):
             ),
             Lote=tpLote(RPS=lista_rps)
         )
+
+        # tpDeducoes(
+        #     DeducaoPor=None,
+        #     TipoDeducao=None,
+        #     # CPFCNPJReferencia=None,
+        #     # NumeroNFReferencia=None,
+        #     # ValorTotalReferencia=None,
+        #     PercentualDeduzir=None,
+        #     ValorDeduzir=None
+        # )
+
+        for line in self.invoice_line_ids:
+            itens.append(
+                tpItens(
+                    DiscriminacaoServico=normalize(
+                        'NFKD', unicode(line.name[:120] or '')
+                    ).encode('ASCII', 'ignore'),
+                    Quantidade=line.quantity,
+                    ValorUnitario=str("%.2f" % line.price_unit),
+                    ValorTotal=str("%.2f" % line.price_gross),
+                    Tributavel=None
+                )
+            )
+
         return lote_rps
