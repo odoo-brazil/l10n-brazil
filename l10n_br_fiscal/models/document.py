@@ -826,3 +826,11 @@ class Document(models.Model):
     def _onchange_document_serie_id(self):
         if self.document_serie_id and self.issuer == DOCUMENT_ISSUER_COMPANY:
             self.document_serie = self.document_serie_id.code
+
+    @api.onchange("fiscal_payment_ids", "payment_term_id")
+    def _onchange_fiscal_payment_ids(self):
+        financial_ids = []
+        for payment in self.fiscal_payment_ids:
+            for line in payment.line_ids:
+                financial_ids.append(line.id)
+        self.financial_ids = [(6, 0, financial_ids)]
