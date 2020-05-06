@@ -649,6 +649,10 @@ class Document(models.Model):
             values['number'] = self._create_serie_number(
                 values.get('document_serie_id'), values['date'])
 
+        if values.get('financial_ids') and values.get('fiscal_payment_ids'):
+            values['fiscal_payment_ids'][0][2]['line_ids'] = \
+                values.pop('financial_ids')
+
         return super(Document, self).create(values)
 
     @api.multi
@@ -894,8 +898,9 @@ class Document(models.Model):
                 company_id=self.company_id,
                 amount=self.amount_missing_payment_value, date=self.date)
             )
-            self.fiscal_payment_ids = self.fiscal_payment_ids.new(vals)
-            #
+            self.fiscal_payment_ids |= self.fiscal_payment_ids.new(vals)
+            for line in self.fiscal_payment_ids.mapped('line_ids'):
+                line.document_id = self            #
             #
             # self.update({
             #     'fiscal_payment_ids': [
