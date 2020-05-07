@@ -867,6 +867,19 @@ class Document(models.Model):
         if self.document_serie_id and self.issuer == DOCUMENT_ISSUER_COMPANY:
             self.document_serie = self.document_serie_id.code
 
+    def check_financial(self):
+        for record in self:
+            if not record.env.context.get('action_document_confirm'):
+                continue
+            elif record.amount_missing_payment_value > 0:
+                if not record.payment_term_id:
+                    raise UserError(
+                        _("O Valor dos lançamentos financeiros é "
+                          "menor que o valor da nota."),
+                    )
+                else:
+                    record.generate_financial()
+
     def generate_financial(self):
         for record in self:
             if self.env.context.get('action_document_confirm'):
