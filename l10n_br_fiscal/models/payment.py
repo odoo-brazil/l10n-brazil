@@ -97,57 +97,38 @@ class FiscalPayment(models.Model):
         if self.document_id:
             return self.document_id.date
 
-    def _prepare_line_id(
-            self, communication, date_maturity, amount, company_id, currency_id):
+    @api.onchange('payment_term_id', 'amount', 'currency_id')
+    def _onchange_payment_term_id(self):
+        self.generate_payment_lines()
 
+    def _prepare_line(self, communication, date_maturity, amount):
         vals = dict()
         vals['communication'] = communication
         vals['date_maturity'] = date_maturity
         vals['amount'] = amount
         vals['payment_id'] = self.id
-        vals['currency_id'] = currency_id.id
-        vals['company_id'] = company_id.id
+        vals['currency_id'] = self.currency_id.id
+        vals['company_id'] = self.company_id.id
         return vals
 
-    @api.onchange('payment_term_id', 'amount', 'currency_id')
-    def _onchange_payment_term_id(self):
+    def generate_payment_lines(self):
+        """
+        Gerar  payment.line a partir do objeto do payment
+        """
+        if self.payment_term_id and self.company_id and self.amount:
 
-        if not self.payment_term_id:
-            return {}
+            line_ids = []
 
-        vals = self._compute_payment_vals(
-            payment_term_id=self.payment_term_id,
-            currency_id=self.currency_id,
-            company_id=self.company_id,
-            amount=self.amount,
-            date=self._get_date(),
-        )
-        self.update(vals)
+            payment_term_list = self.payment_term_id.compute(
+                value=self.amount or 0, date_ref=self._get_date()
+            )[0]
 
-    def _compute_payment_vals(
-            self, payment_term_id, currency_id, company_id, amount, date):
-
-        payment_term_list = payment_term_id.with_context(
-            currency_id=currency_id.id
-        ).compute(value=amount or 0, date_ref=date)[0]
-
-        line_ids = [(6, 0, {})]
-
-        if payment_term_list:
             communication = 1
+
             for date_maturity, amount in payment_term_list:
-                line_ids.append((
-                    0, 0, self._prepare_line_id(
-                        communication, date_maturity, amount, company_id, currency_id)
-                ))
+                line_dict = \
+                    self._prepare_line(communication, date_maturity, amount)
+                line_ids.append(line_dict)
                 communication += 1
-        return {
-            'forma_pagamento': payment_term_id.forma_pagamento,
-            'bandeira_cartao': payment_term_id.bandeira_cartao,
-            'integracao_cartao': payment_term_id.integracao_cartao,
-            'partner_id': payment_term_id.partner_id.id,
-            'cnpj_cpf':
-                payment_term_id.partner_id and
-                payment_term_id.partner_id.cnpj_cpf or False,
-            'line_ids': line_ids
-        }
+
+            self.line_ids = self.line_ids.create(line_ids)
