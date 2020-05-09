@@ -128,7 +128,7 @@ class FiscalPayment(models.Model):
             for date_maturity, amount in payment_term_list:
                 line_dict = \
                     self._prepare_line(communication, date_maturity, amount)
-                line_ids.append(line_dict)
+                line_ids.append([0, 0, line_dict])
                 communication += 1
 
-            self.line_ids = self.line_ids.create(line_ids)
+            self.line_ids = line_ids

@@ -537,7 +537,8 @@ class Document(models.Model):
         string='Pagamentos',
         copy=True,
         compute='_compute_fiscal_payment_ids',
-        inverse='_set_fiscal_payment_ids'
+        inverse='_set_fiscal_payment_ids',
+        store=True,
     )
 
     fiscal_payment_temp_ids = fields.Many2many(
@@ -549,7 +550,8 @@ class Document(models.Model):
         inverse_name='document_id',
         string='Duplicatas',
         copy=True,
-        compute='_compute_financial_ids'
+        compute='_compute_financial_ids',
+        store = True,
     )
 
     comment_ids = fields.Many2many(
@@ -975,6 +977,7 @@ class Document(models.Model):
                 'amount': self.amount_total,
                 'currency_id': self.currency_id.id,
                 'company_id': self.company_id.id,
+                'document_id': self.id,
             }
 
             self.fiscal_payment_ids = self.fiscal_payment_ids.create(vals)

@@ -172,7 +172,7 @@
                         'default_date': date,
                         'default_currency_id': currency_id,
                         'default_company_id': company_id,
-                        'default_document_id': id,
+                        'default_document_id': active_id,
                         }" nolabel="1"/>
                   <label for="" string="Troco"/>
                   <field name="amount_change_value"/>

@@ -10,7 +10,7 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <field name="document_id"  invisible="1"/>
+                    <field name="document_id"  />
                     <field name="company_id"  invisible="1"/>
                     <field name="currency_id"  invisible="1"/>
                     <group>
@@ -28,7 +28,7 @@
                             'default_payment_id': id,
                             }" >
                             <tree string="Duplicatas" editable="bottom">
-                                <field name="document_id"  invisible="1"/>
+                                <field name="document_id" invisible="1"/>
                                 <field name="currency_id"  invisible="1"/>
                                 <field name="company_id"  invisible="1"/>
                                 <field name="payment_id"  invisible="1"/>
