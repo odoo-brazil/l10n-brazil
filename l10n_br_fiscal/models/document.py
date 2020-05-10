@@ -536,13 +536,16 @@ class Document(models.Model):
         inverse_name='document_id',
         string='Pagamentos',
         copy=True,
-        compute='_compute_fiscal_payment_ids',
+        compute='generate_financial',
         inverse='_set_fiscal_payment_ids',
         store=True,
     )
 
-    fiscal_payment_temp_ids = fields.Many2many(
+    fiscal_payment_temp_ids = fields.One2many(
         comodel_name='l10n_br_fiscal.payment',
+        inverse_name='document_id',
+        string='Pagamentos',
+        copy=True,
     )
 
     financial_ids = fields.One2many(
@@ -551,7 +554,6 @@ class Document(models.Model):
         string='Duplicatas',
         copy=True,
         compute='_compute_financial_ids',
-        store = True,
     )
 
     comment_ids = fields.Many2many(
@@ -659,11 +661,16 @@ class Document(models.Model):
             values['number'] = self._create_serie_number(
                 values.get('document_serie_id'), values['date'])
 
-        # if values.get('financial_ids') and values.get('fiscal_payment_ids'):
-        #     values['fiscal_payment_ids'][0][2]['line_ids'] = \
-        #         values.pop('financial_ids')
+        document_id = super(Document, self).create(values)
 
-        return super(Document, self).create(values)
+        # Preencher campo computado com edição do form
+        if values.get('fiscal_payment_ids'):
+            vfiscal_payment_ids = self.fiscal_payment_ids.\
+                new(values.get('fiscal_payment_ids')[0][2])
+            for vfiscal_payment_id in vfiscal_payment_ids:
+                vfiscal_payment_id.document_id = document_id
+
+        return document_id
 
     @api.multi
     @api.onchange('document_section')
@@ -877,18 +884,18 @@ class Document(models.Model):
         if self.document_serie_id and self.issuer == DOCUMENT_ISSUER_COMPANY:
             self.document_serie = self.document_serie_id.code
 
-    # def check_financial(self):
-    #     for record in self:
-    #         if not record.env.context.get('action_document_confirm'):
-    #             continue
-    #         elif record.amount_missing_payment_value > 0:
-    #             if not record.payment_term_id:
-    #                 raise UserError(
-    #                     _("O Valor dos lançamentos financeiros é "
-    #                       "menor que o valor da nota."),
-    #                 )
-    #             else:
-    #                 record.generate_financial()
+    def check_financial(self):
+        for record in self:
+            if not record.env.context.get('action_document_confirm'):
+                continue
+            elif record.amount_missing_payment_value > 0:
+                if not record.payment_term_id:
+                    raise UserError(
+                        _("O Valor dos lançamentos financeiros é "
+                          "menor que o valor da nota."),
+                    )
+                else:
+                    record.generate_financial()
     #
     # def generate_financial(self):
     #     for record in self:
@@ -949,37 +956,35 @@ class Document(models.Model):
 
     @api.depends('fiscal_payment_ids')
     def _compute_financial_ids(self):
-        print('_compute_financial_ids')
-        self.financial_ids = self.fiscal_payment_ids.mapped('line_ids')
+        for record in self:
+            fiscal_payment_ids = record.mapped('fiscal_payment_ids')
+            record.financial_ids = fiscal_payment_ids.mapped('line_ids')
 
     def _set_fiscal_payment_ids(self):
         """
         Ativar edição do campo, Quando o usuário selecionar
         """
-        self = self.with_context(
-            fiscal_payment_temp_ids=self.fiscal_payment_ids)
-        return
+        pass
 
     @api.depends('payment_term_id', 'date', 'amount_total')
-    @api.multi
-    def _compute_fiscal_payment_ids(self):
+    def generate_financial(self):
         """
         Calcular payments no onchange
         """
-        if self.env.context.get('fiscal_payment_temp_ids'):
-            self.fiscal_payment_ids = \
-                self.env.context.get('fiscal_payment_temp_ids')
-            self = self.with_context(fiscal_payment_temp_ids=False)
+        for record in self:
+            if record.fiscal_payment_temp_ids:
+                record.fiscal_payment_ids = record.fiscal_payment_temp_ids
 
-        elif self.payment_term_id:
-            vals = {
-                'payment_term_id': self.payment_term_id.id,
-                'amount': self.amount_total,
-                'currency_id': self.currency_id.id,
-                'company_id': self.company_id.id,
-                'document_id': self.id,
-            }
+            elif record.payment_term_id:
+                vals = {
+                    'payment_term_id': record.payment_term_id.id,
+                    'amount': record.amount_total,
+                    'currency_id': record.currency_id.id,
+                    'company_id': record.company_id.id,
+                    'document_id': record.id,
+                }
 
-            self.fiscal_payment_ids = self.fiscal_payment_ids.create(vals)
+                record.fiscal_payment_ids =\
+                    self.env['l10n_br_fiscal.payment'].create(vals)
 
-            self.fiscal_payment_ids.generate_payment_lines()
+                record.fiscal_payment_ids.generate_payment_lines()

@@ -732,8 +732,4 @@
         <value eval="[ref('l10n_br_fiscal.demo_nfe_financial_valor_superior_payment_2')]"/>
     </function>
 
-    <function model="l10n_br_fiscal.document" name="_onchange_fiscal_payment_ids">
-        <value eval="[ref('l10n_br_fiscal.demo_nfe_financial_valor_superior')]"/>
-    </function>
-
 </odoo>

@@ -101,7 +101,7 @@ class FiscalPayment(models.Model):
     def _onchange_payment_term_id(self):
         self.generate_payment_lines()
 
-    def _prepare_line(self, communication, date_maturity, amount):
+    def _prepare_line_id(self, communication, date_maturity, amount):
         vals = dict()
         vals['communication'] = communication
         vals['date_maturity'] = date_maturity
@@ -115,20 +115,19 @@ class FiscalPayment(models.Model):
         """
         Gerar  payment.line a partir do objeto do payment
         """
-        if self.payment_term_id and self.company_id and self.amount:
+        for record in self:
+            if record.payment_term_id and record.company_id and record.amount:
+                line_ids = []
 
-            line_ids = []
+                payment_term_list = record.payment_term_id.compute(
+                    value=record.amount or 0, date_ref=record._get_date()
+                )[0]
 
-            payment_term_list = self.payment_term_id.compute(
-                value=self.amount or 0, date_ref=self._get_date()
-            )[0]
+                communication = 1
+                for date_maturity, amount in payment_term_list:
+                    line_dict = record._prepare_line_id(
+                        communication, date_maturity, amount)
+                    line_ids.append([0, 0, line_dict])
+                    communication += 1
 
-            communication = 1
-
-            for date_maturity, amount in payment_term_list:
-                line_dict = \
-                    self._prepare_line(communication, date_maturity, amount)
-                line_ids.append([0, 0, line_dict])
-                communication += 1
-
-            self.line_ids = line_ids
+                record.line_ids = line_ids
