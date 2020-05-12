@@ -954,7 +954,7 @@ class Document(models.Model):
     #         for line in self.fiscal_payment_ids.mapped('line_ids'):
     #             line.document_id = self
 
-    @api.depends('fiscal_payment_ids')
+    @api.depends('fiscal_payment_ids.line_ids')
     def _compute_financial_ids(self):
         for record in self:
             fiscal_payment_ids = record.mapped('fiscal_payment_ids')

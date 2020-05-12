@@ -117,7 +117,7 @@ class FiscalPayment(models.Model):
         """
         for record in self:
             if record.payment_term_id and record.company_id and record.amount:
-                line_ids = []
+                line_ids = [(5, 0, 0)]
 
                 payment_term_list = record.payment_term_id.compute(
                     value=record.amount or 0, date_ref=record._get_date()
