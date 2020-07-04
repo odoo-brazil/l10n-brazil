@@ -37,7 +37,6 @@
         "data/ir_cron.xml",
         "data/l10n_br_fiscal_comment_data.xml",
         "data/payment_term_data.xml",
-        "data/payment_mode_data.xml",
 
         # Wizards
         "wizards/wizard_document_cancel_view.xml",
@@ -99,7 +98,6 @@
         "views/document_correction.xml",
         'views/payment_view.xml',
         'views/payment_term_view.xml',
-        'views/payment_mode_view.xml',
     ],
     "demo": [
         # Some demo data is being loaded via post_init_hook in hook file
