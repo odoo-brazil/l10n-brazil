@@ -88,6 +88,20 @@ class AccountInvoice(models.Model):
         copy=True,
     )
 
+    financial_ids = fields.One2many(
+        comodel_name='l10n_br_fiscal.payment.line',
+        inverse_name=_payment_inverse_name,
+        string='Duplicatas',
+        copy=True,
+    )
+
+    fiscal_payment_ids = fields.One2many(
+        comodel_name='l10n_br_fiscal.payment',
+        inverse_name=_payment_inverse_name,
+        string='Pagamentos',
+        copy=True,
+    )
+
     @api.multi
     def _prepare_shadowed_fields_dict(self, default=False):
         self.ensure_one()
