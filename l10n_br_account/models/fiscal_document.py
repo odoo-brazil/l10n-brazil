@@ -105,3 +105,10 @@ class FiscalDocument(models.Model):
                 # 'move_name': move.name,
             }
             record.with_context(ctx).write(vals)
+
+    def _prepare_payment_mixin_inverse_vals(self):
+        vals = super(FiscalDocument, self)._prepare_payment_mixin_inverse_vals()
+        if self.invoice_id:
+            vals['invoice_id'] = self.invoice_id.id
+        return vals
+
