@@ -71,7 +71,7 @@ class DocumentLine(models.Model):
             'valor_ir': float(self.irpj_value),
             'valor_csll': float(self.csll_value),
             'iss_retido': '1' if self.issqn_wh_value else '2',
-            'valor_iss': float(self.issqn_value),
+            'valor_iss': 0.00,
             'valor_iss_retido': float(self.issqn_wh_value),
             'outras_retencoes': float(self.other_retentions_value),
             'base_calculo': float(self.issqn_base),
