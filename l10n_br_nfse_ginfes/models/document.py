@@ -78,7 +78,7 @@ class Document(models.Model):
                 ValorLiquidoNfse=dados['valor_liquido_nfse'],
             ),
             ItemListaServico=dados['item_lista_servico'],
-            CodigoCnae=dados['codigo_cnae'],
+            CodigoCnae=None,
             CodigoTributacaoMunicipio=dados['codigo_tributacao_municipio'],
             Discriminacao=dados['discriminacao'],
             CodigoMunicipio=dados['codigo_municipio'],
