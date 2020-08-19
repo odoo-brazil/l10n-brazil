@@ -14,6 +14,9 @@
     'website': 'http://github.com/OCA/l10n-brazil',
     'depends': ['l10n_br_account_payment_order'],
     'data': [
+        # Security
+        'security/ir.model.access.csv',
+
         # Views
         'views/res_company.xml',
         'views/account_invoice.xml',
