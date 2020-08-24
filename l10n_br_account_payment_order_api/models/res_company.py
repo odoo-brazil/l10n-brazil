@@ -37,3 +37,9 @@ class ResCompany(models.Model):
         string='Validade do Token',
         readonly=True,
     )
+
+    environment = fields.Selection(
+        string='Ambiente',
+        selection=[('1', 'HOMOLOGAÇÃO'), ('2', 'PRODUÇÃO')],
+        default='1',
+    )
