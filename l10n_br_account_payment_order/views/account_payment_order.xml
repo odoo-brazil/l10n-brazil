@@ -31,6 +31,7 @@
                 <!-- campo referente ao lote só existe no 240 -->
                 <field name="service_type" attrs="{'invisible': [('payment_method_code', '!=', '240')]}"/>
                 <field name="release_form" attrs="{'invisible': [('payment_method_code', '!=', '240')]}"/>
+                <field name="release_form_itau"/>
                 <field name="code_convetion"/>
             </field>
             <field name="company_id" position="after">

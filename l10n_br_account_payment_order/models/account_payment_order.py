@@ -14,6 +14,7 @@ from odoo import api, fields, models
 
 from ..constants import (
     FORMA_LANCAMENTO,
+    FORMA_LANCAMENTO_ITAU,
     INDICATIVO_FORMA_PAGAMENTO,
     TIPO_SERVICO,
 )
@@ -47,6 +48,12 @@ class AccountPaymentOrder(models.Model):
     release_form = fields.Selection(
         selection=FORMA_LANCAMENTO,
         string='Forma Lançamento',
+        help='Campo G029 do CNAB',
+    )
+
+    release_form_itau = fields.Selection(
+        selection=FORMA_LANCAMENTO_ITAU,
+        string='Forma Lançamento Itaú',
         help='Campo G029 do CNAB',
     )
 
