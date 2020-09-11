@@ -179,6 +179,34 @@ FORMA_LANCAMENTO = [
     EXTRATO_CONTA_INVESTIMENTO,
 ]
 
+FORMA_LANCAMENTO_ITAU = [
+    ('01', 'CRÉDITO EM CONTA CORRENTE NO ITAÚ'),
+    ('02', 'CHEQUE PAGAMENTO/ADMINISTRATIVO'),
+    ('03', 'DOC “C ”'),
+    ('05', 'CRÉDITO EM CONTA POUPANÇA NO ITAÚ'),
+    ('06', 'CRÉDITO EM CONTA CORRENTE DE MESMA TITULARIDADE'),
+    ('07', 'DOC “D ”'),
+    ('10', 'ORDEM DE PAGAMENTO À DISPOSIÇÃO'),
+    ('11', 'ORDEM DE PAGAMENTO DE ACERTO – SOMENTE RETORNO - VER OBSERVAÇÃO ABAIXO'),
+    ('13', 'PAGAMENTO DE CONCESSIONÁRIAS'),
+    ('16', 'DARF NORMAL'),
+    ('17', 'GPS - GUIA DA PREVIDÊNCIA SOCIAL'),
+    ('18', 'DARF SIMPLES'),
+    ('19', 'IPTU/ISS/OUTROS TRIBUTOS MUNICIPAIS'),
+    ('21', 'DARJ'),
+    ('22', 'GARE – SP ICMS'),
+    ('25', 'IPVA'),
+    ('27', 'DPVAT'),
+    ('30', 'PAGAMENTO DE TÍTULOS EM COBRANÇA NO ITAÚ'),
+    ('31', 'PAGAMENTO DE TÍTULOS EM COBRANÇA EM OUTROS BANCOS'),
+    ('32', 'NOTA FISCAL – LIQUIDAÇÃO ELETRÔNICA'),
+    ('35', 'FGTS – GFIP'),
+    ('41', 'TED – OUTRO TITULAR'),
+    ('43', 'TED – MESMO TITULAR'),
+    ('60', 'CARTÃO SALÁRIO'),
+    ('91', 'GNRE E TRIBUTOS COM CÓDIGO DE BARRAS'),
+]
+
 CREDITO_EM_CONTA = ("01", "01 - Crédito em Conta")
 PAGAMENTO_ALUGUEL = ("02", "02 - Pagamento de Aluguel/Condomínio")
 PAGAMENTO_DUPLICATA_TITULOS = ("03", "03 - Pagamento de Duplicata/Títulos")
@@ -229,7 +257,53 @@ COMPLEMENTO_TIPO_SERVICO = [
 # (www.bcb.gov.br), Sistema de Pagamentos Brasileiro,
 # Transferência de Arquivos,
 # Dicionários de Domínios para o SPB.
-CODIGO_FINALIDADE_TED = [("    ", "Padrão")]
+CODIGO_FINALIDADE_TED = [
+    ("    ", "Padrão"),
+    ("00001", "Pagamento de Impostos, Tributos e Taxas"),
+    ("00002", "Pagamento a Concessionárias de Serviço Público"),
+    ("00003", "Pagamento de Dividendos"),
+    ("00004", "Pagamento de Salários"),
+    ("00005", "Pagamento de Fornecedores"),
+    ("00006", "Pagamento de Honorários"),
+    ("00007", "Pagamento de Aluguéis e Taxas e Condomínio"),
+    ("00008", "Pagamento de Duplicatas e Títulos"),
+    ("00009", "Pagamento de Honorários"),
+    ("00010", "Crédito em Conta"),
+    ("00011", "Pagamento a Corretoras"),
+    ("00016", "Crédito em Conta Investimento"),
+    ("00100", "Depósito Judicial"),
+    ("00101", "Pensão Alimentícia"),
+    ("00200", "Transferência Internacional de Reais"),
+    ("00201", "Ajuste Posição Mercado Futuro"),
+    ("00204",
+     "Compra/Venda de Ações – Bolsas de Valores e Mercado de Balcão"),
+    ("00205", "Contrato referenciado em Ações/Índices de Ações – BV/BMF"),
+    ("00300", "Restituição de Imposto de Renda"),
+    ("00500", "Restituição de Prêmio de Seguros"),
+    ("00501", "Pagamento de indenização de Sinistro de Seguro"),
+    ("00502", "Pagamento de Prêmio de Co-seguro"),
+    ("00503", "Restituição de prêmio de Co-seguro"),
+    ("00504", "Pagamento de indenização de Co-seguro"),
+    ("00505", "Pagamento de prêmio de Resseguro"),
+    ("00506", "Restituição de prêmio de Resseguro"),
+    ("00507", "Pagamento de Indenização de Sinistro de Resseguro"),
+    ("00508", "Restituição de Indenização de Sinistro de Resseguro"),
+    ("00509", "Pagamento de Despesas com Sinistros"),
+    ("00510", "Pagamento de Inspeções/Vistorias Prévias"),
+    ("00511", "Pagamento de Resgate de Título de Capitalização"),
+    ("00512", "Pagamento de Sorteio de Título de Capitalização"),
+    ("00513",
+     "Pagamento de Devolução de Mensalidade de Título de Capitalização"),
+    ("00514", "Restituição de Contribuição de Plano Previdenciário"),
+    ("00515", "Pagamento de Benefício Previdenciário de Pecúlio"),
+    ("00516", "Pagamento de Benefício Previdenciário de Pensão"),
+    ("00517", "Pagamento de Benefício Previdenciário de Aposentadoria"),
+    ("00518", "Pagamento de Resgate Previdenciário"),
+    ("00519", "Pagamento de Comissão de Corretagem"),
+    ("00520",
+     "Pagamento de Transferências/Portabilidade de "
+     "Reserva de Seguro/Previdência"),
+]
 
 NAO_EMITE_AVISO = ("0", "0 - Não Emite Aviso")
 EMITE_AVISO_REMETENTE = ("2", "2 - Emite Aviso Somente para o Remetente")
