@@ -1,0 +1,925 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Forma de Lançamento Itaú -->
+
+    <record id="forma_lancamento_01_itau" model="l10n_br.cnab.option">
+        <field name="code">01</field>
+        <field name="description">CRÉDITO EM CONTA CORRENTE NO ITAÚ</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_02_itau" model="l10n_br.cnab.option">
+        <field name="code">02</field>
+        <field name="description">CHEQUE PAGAMENTO/ADMINISTRATIVO</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_03_itau" model="l10n_br.cnab.option">
+        <field name="code">03</field>
+        <field name="description">DOC “C ”</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_05_itau" model="l10n_br.cnab.option">
+        <field name="code">05</field>
+        <field name="description">CRÉDITO EM CONTA POUPANÇA NO ITAÚ</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_06_itau" model="l10n_br.cnab.option">
+        <field name="code">06</field>
+        <field name="description">CRÉDITO EM CONTA CORRENTE DE MESMA TITULARIDADE</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_07_itau" model="l10n_br.cnab.option">
+        <field name="code">07</field>
+        <field name="description">DOC “D ”</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_10_itau" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">ORDEM DE PAGAMENTO À DISPOSIÇÃO</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_11_itau" model="l10n_br.cnab.option">
+        <field name="code">11</field>
+        <field name="description">ORDEM DE PAGAMENTO DE ACERTO – SOMENTE RETORNO - VER OBSERVAÇÃO ABAIXO</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_13_itau" model="l10n_br.cnab.option">
+        <field name="code">13</field>
+        <field name="description">PAGAMENTO DE CONCESSIONÁRIAS</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_16_itau" model="l10n_br.cnab.option">
+        <field name="code">16</field>
+        <field name="description">DARF NORMAL</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_17_itau" model="l10n_br.cnab.option">
+        <field name="code">17</field>
+        <field name="description">GPS - GUIA DA PREVIDÊNCIA SOCIAL</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_18_itau" model="l10n_br.cnab.option">
+        <field name="code">18</field>
+        <field name="description">DARF SIMPLES</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_19_itau" model="l10n_br.cnab.option">
+        <field name="code">19</field>
+        <field name="description">IPTU/ISS/OUTROS TRIBUTOS MUNICIPAIS</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_21_itau" model="l10n_br.cnab.option">
+        <field name="code">21</field>
+        <field name="description">DARJ</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_22_itau" model="l10n_br.cnab.option">
+        <field name="code">22</field>
+        <field name="description">GARE – SP ICMS</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_25_itau" model="l10n_br.cnab.option">
+        <field name="code">25</field>
+        <field name="description">IPVA</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_27_itau" model="l10n_br.cnab.option">
+        <field name="code">27</field>
+        <field name="description">DPVAT</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_30_itau" model="l10n_br.cnab.option">
+        <field name="code">30</field>
+        <field name="description">PAGAMENTO DE TÍTULOS EM COBRANÇA NO ITAÚ</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_31_itau" model="l10n_br.cnab.option">
+        <field name="code">31</field>
+        <field name="description">PAGAMENTO DE TÍTULOS EM COBRANÇA EM OUTROS BANCOS</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_32_itau" model="l10n_br.cnab.option">
+        <field name="code">32</field>
+        <field name="description">NOTA FISCAL – LIQUIDAÇÃO ELETRÔNICA</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_35_itau" model="l10n_br.cnab.option">
+        <field name="code">35</field>
+        <field name="description">FGTS – GFIP</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_41_itau" model="l10n_br.cnab.option">
+        <field name="code">41</field>
+        <field name="description">TED – OUTRO TITULAR</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_43_itau" model="l10n_br.cnab.option">
+        <field name="code">43</field>
+        <field name="description">TED – MESMO TITULAR</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_60_itau" model="l10n_br.cnab.option">
+        <field name="code">60</field>
+        <field name="description">CARTÃO SALÁRIO</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="forma_lancamento_91_itau" model="l10n_br.cnab.option">
+        <field name="code">91</field>
+        <field name="description">GNRE E TRIBUTOS COM CÓDIGO DE BARRAS</field>
+        <field name="option_type">release_form</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+
+    <!-- Tipo de Serviço Itaú -->
+
+    <record id="tipo_servico_10_itau" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">Dividendos</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_15_itau" model="l10n_br.cnab.option">
+        <field name="code">15</field>
+        <field name="description">Debêntures</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_20_itau" model="l10n_br.cnab.option">
+        <field name="code">20</field>
+        <field name="description">Fornecedores</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_22_itau" model="l10n_br.cnab.option">
+        <field name="code">22</field>
+        <field name="description">TRIBUTOS</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_30_itau" model="l10n_br.cnab.option">
+        <field name="code">30</field>
+        <field name="description">Salários</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_40_itau" model="l10n_br.cnab.option">
+        <field name="code">40</field>
+        <field name="description">Fundos de Investimentos</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_50_itau" model="l10n_br.cnab.option">
+        <field name="code">50</field>
+        <field name="description">Sinistros DE Seguros</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_60_itau" model="l10n_br.cnab.option">
+        <field name="code">60</field>
+        <field name="description">Despesas Viajante em Trânsito</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_80_itau" model="l10n_br.cnab.option">
+        <field name="code">80</field>
+        <field name="description">Representantes Autorizados</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_90_itau" model="l10n_br.cnab.option">
+        <field name="code">90</field>
+        <field name="description">Benefícios</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="tipo_servico_98_itau" model="l10n_br.cnab.option">
+        <field name="code">98</field>
+        <field name="description">Diversos</field>
+        <field name="option_type">service_type</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+
+    <!-- Código da Finalidade da DOC Itaú -->
+
+    <record id="codigo_finalidade_doc_01_itau" model="l10n_br.cnab.option">
+        <field name="code">01</field>
+        <field name="description">Crédito em Conta</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_02_itau" model="l10n_br.cnab.option">
+        <field name="code">02</field>
+        <field name="description">Pagamento de Aluguel / Condomínio</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_03_itau" model="l10n_br.cnab.option">
+        <field name="code">03</field>
+        <field name="description">Pagamento de Duplicata / Títulos</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_04_itau" model="l10n_br.cnab.option">
+        <field name="code">04</field>
+        <field name="description">Pagamento de Dividendos</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_05_itau" model="l10n_br.cnab.option">
+        <field name="code">05</field>
+        <field name="description">Pagamento de Mensalidade Escolar</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_06_itau" model="l10n_br.cnab.option">
+        <field name="code">06</field>
+        <field name="description">Pagamento de Salários</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_07_itau" model="l10n_br.cnab.option">
+        <field name="code">07</field>
+        <field name="description">Pagamento de Fornecedores / Honorários</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_08_itau" model="l10n_br.cnab.option">
+        <field name="code">08</field>
+        <field name="description">Operações de Câmbio / Fundos</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_09_itau" model="l10n_br.cnab.option">
+        <field name="code">09</field>
+        <field name="description">Repasse de Arrecadação / Pagamento de Tributos</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_10_itau" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">Transferência Internacional de Reais</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_11_itau" model="l10n_br.cnab.option">
+        <field name="code">11</field>
+        <field name="description">DOC para Poupança</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_12_itau" model="l10n_br.cnab.option">
+        <field name="code">12</field>
+        <field name="description">DOC para Depósito Judicial</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_13_itau" model="l10n_br.cnab.option">
+        <field name="code">13</field>
+        <field name="description">Pensão Alimentícia</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+    <record id="codigo_finalidade_doc_99_itau" model="l10n_br.cnab.option">
+        <field name="code">99</field>
+        <field name="description">Outros</field>
+        <field name="option_type">doc_finality_code</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_341"/>
+    </record>
+
+    <!-- Forma de Lançamento Padrão -->
+
+    <record id="forma_lancamento_01_padrao" model="l10n_br.cnab.option">
+        <field name="code">01</field>
+        <field name="description">Crédito em Conta Corrente/Salário</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_02_padrao" model="l10n_br.cnab.option">
+        <field name="code">02</field>
+        <field name="description">Cheque Pagamento / Administrativo</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_03_padrao" model="l10n_br.cnab.option">
+        <field name="code">03</field>
+        <field name="description">DOC/TED (1) (2)</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_04_padrao" model="l10n_br.cnab.option">
+        <field name="code">04</field>
+        <field name="description">Cartão Salário (somente para Tipo de Serviço = '30')</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_05_padrao" model="l10n_br.cnab.option">
+        <field name="code">05</field>
+        <field name="description">Crédito em Conta Poupança</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_10_padrao" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">OP à Disposição</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_11_padrao" model="l10n_br.cnab.option">
+        <field name="code">11</field>
+        <field name="description">Pagamento de Contas e Tributos com Código de Barras</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_16_padrao" model="l10n_br.cnab.option">
+        <field name="code">16</field>
+        <field name="description">Tributo - DARF Normal</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_17_padrao" model="l10n_br.cnab.option">
+        <field name="code">17</field>
+        <field name="description">Tributo - GPS (Guia da Previdência Social)</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_18_padrao" model="l10n_br.cnab.option">
+        <field name="code">18</field>
+        <field name="description">Tributo - DARF Simples</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_19_padrao" model="l10n_br.cnab.option">
+        <field name="code">19</field>
+        <field name="description">Tributo - IPTU – Prefeituras</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_20_padrao" model="l10n_br.cnab.option">
+        <field name="code">20</field>
+        <field name="description">Pagamento com Autenticação</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_21_padrao" model="l10n_br.cnab.option">
+        <field name="code">21</field>
+        <field name="description">Tributo – DARJ</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_22_padrao" model="l10n_br.cnab.option">
+        <field name="code">22</field>
+        <field name="description">Tributo - GARE-SP ICMS</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_23_padrao" model="l10n_br.cnab.option">
+        <field name="code">23</field>
+        <field name="description">Tributo - GARE-SP DR</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_24_padrao" model="l10n_br.cnab.option">
+        <field name="code">24</field>
+        <field name="description">Tributo - GARE-SP ITCMD</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_25_padrao" model="l10n_br.cnab.option">
+        <field name="code">25</field>
+        <field name="description">Tributo - IPVA</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_26_padrao" model="l10n_br.cnab.option">
+        <field name="code">26</field>
+        <field name="description">Tributo - Licenciamento</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_27_padrao" model="l10n_br.cnab.option">
+        <field name="code">27</field>
+        <field name="description">Tributo – DPVAT</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_30_padrao" model="l10n_br.cnab.option">
+        <field name="code">30</field>
+        <field name="description">Liquidação de Títulos do Próprio Banco</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_31_padrao" model="l10n_br.cnab.option">
+        <field name="code">31</field>
+        <field name="description">Pagamento de Títulos de Outros Bancos</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_40_padrao" model="l10n_br.cnab.option">
+        <field name="code">40</field>
+        <field name="description">Extrato de Conta Corrente</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_41_padrao" model="l10n_br.cnab.option">
+        <field name="code">41</field>
+        <field name="description">TED – Outra Titularidade (1)</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_43_padrao" model="l10n_br.cnab.option">
+        <field name="code">43</field>
+        <field name="description">TED – Mesma Titularidade (1)</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_44_padrao" model="l10n_br.cnab.option">
+        <field name="code">44</field>
+        <field name="description">TED para Transferência de Conta Investimento</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_50_padrao" model="l10n_br.cnab.option">
+        <field name="code">50</field>
+        <field name="description">Débito em Conta Corrente</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_70_padrao" model="l10n_br.cnab.option">
+        <field name="code">70</field>
+        <field name="description">Extrato para Gestão de Caixa</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_71_padrao" model="l10n_br.cnab.option">
+        <field name="code">71</field>
+        <field name="description">Depósito Judicial em Conta Corrente</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_72_padrao" model="l10n_br.cnab.option">
+        <field name="code">72</field>
+        <field name="description">Depósito Judicial em Poupança</field>
+        <field name="option_type">release_form</field>
+    </record>
+    <record id="forma_lancamento_73_padrao" model="l10n_br.cnab.option">
+        <field name="code">73</field>
+        <field name="description">Extrato de Conta Investimento</field>
+        <field name="option_type">release_form</field>
+    </record>
+
+    <!-- Tipo de Serviço Padrão -->
+
+    <record id="tipo_servico_01_padrao" model="l10n_br.cnab.option">
+        <field name="code">01</field>
+        <field name="description">Cobrança</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_03_padrao" model="l10n_br.cnab.option">
+        <field name="code">03</field>
+        <field name="description">Boleto de Pagamento Eletrônico</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_04_padrao" model="l10n_br.cnab.option">
+        <field name="code">04</field>
+        <field name="description">Conciliação Bancária</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_05_padrao" model="l10n_br.cnab.option">
+        <field name="code">05</field>
+        <field name="description">Débitos</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_06_padrao" model="l10n_br.cnab.option">
+        <field name="code">06</field>
+        <field name="description">Custódia de Cheques</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_07_padrao" model="l10n_br.cnab.option">
+        <field name="code">07</field>
+        <field name="description">Gestão de Caixa</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_08_padrao" model="l10n_br.cnab.option">
+        <field name="code">08</field>
+        <field name="description">Consulta/Informação Margem</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_09_padrao" model="l10n_br.cnab.option">
+        <field name="code">09</field>
+        <field name="description">Averbação da Consignação/Retenção</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_10_padrao" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">Pagamento Dividendos</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_11_padrao" model="l10n_br.cnab.option">
+        <field name="code">11</field>
+        <field name="description">Manutenção da Consignação</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_12_padrao" model="l10n_br.cnab.option">
+        <field name="code">12</field>
+        <field name="description">Consignação de Parcelas</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_13_padrao" model="l10n_br.cnab.option">
+        <field name="code">13</field>
+        <field name="description"> Glosa da Consignação (INSS)</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_14_padrao" model="l10n_br.cnab.option">
+        <field name="code">14</field>
+        <field name="description">Consulta de Tributos a pagar</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_20_padrao" model="l10n_br.cnab.option">
+        <field name="code">20</field>
+        <field name="description">Pagamento Fornecedor</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_22_padrao" model="l10n_br.cnab.option">
+        <field name="code">22</field>
+        <field name="description">Pagamento de Contas, Tributos e Impostos</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_23_padrao" model="l10n_br.cnab.option">
+        <field name="code">23</field>
+        <field name="description">Interoperabilidade entre Contas de Instituições de Pagamentos</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_25_padrao" model="l10n_br.cnab.option">
+        <field name="code">25</field>
+        <field name="description">Compror</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_26_padrao" model="l10n_br.cnab.option">
+        <field name="code">26</field>
+        <field name="description">Compror Rotativo</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_29_padrao" model="l10n_br.cnab.option">
+        <field name="code">29</field>
+        <field name="description">Alegação do Pagador</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_30_padrao" model="l10n_br.cnab.option">
+        <field name="code">30</field>
+        <field name="description">Pagamento Salários</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_32_padrao" model="l10n_br.cnab.option">
+        <field name="code">32</field>
+        <field name="description">Pagamento de honorários</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_33_padrao" model="l10n_br.cnab.option">
+        <field name="code">33</field>
+        <field name="description">Pagamento de bolsa auxílio</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_34_padrao" model="l10n_br.cnab.option">
+        <field name="code">34</field>
+        <field name="description">Pagamento de prebenda (remuneração a padres e sacerdotes)</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_40_padrao" model="l10n_br.cnab.option">
+        <field name="code">40</field>
+        <field name="description">Vendor</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_41_padrao" model="l10n_br.cnab.option">
+        <field name="code">41</field>
+        <field name="description">Vendor a Termo</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_50_padrao" model="l10n_br.cnab.option">
+        <field name="code">50</field>
+        <field name="description">Pagamento Sinistros Segurados</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_60_padrao" model="l10n_br.cnab.option">
+        <field name="code">60</field>
+        <field name="description">Pagamento Despesas Viajante em Trânsito</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_70_padrao" model="l10n_br.cnab.option">
+        <field name="code">70</field>
+        <field name="description">Pagamento Autorizado</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_75_padrao" model="l10n_br.cnab.option">
+        <field name="code">75</field>
+        <field name="description">Pagamento Credenciados</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_77_padrao" model="l10n_br.cnab.option">
+        <field name="code">77</field>
+        <field name="description">Pagamento de Remuneração</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_80_padrao" model="l10n_br.cnab.option">
+        <field name="code">80</field>
+        <field name="description">Pagamento Representantes / Vendedores Autorizados</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_90_padrao" model="l10n_br.cnab.option">
+        <field name="code">90</field>
+        <field name="description">Pagamento Benefícios</field>
+        <field name="option_type">service_type</field>
+    </record>
+    <record id="tipo_servico_98_padrao" model="l10n_br.cnab.option">
+        <field name="code">98</field>
+        <field name="description">Pagamentos Diversos</field>
+        <field name="option_type">service_type</field>
+    </record>
+
+    <!-- Código da Finalidade da TED Padrão -->
+
+    <record id="codigo_finalidade_ted_00001_padrao" model="l10n_br.cnab.option">
+        <field name="code">00001</field>
+        <field name="description">Pagamento de Impostos, Tributos e Taxas</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00002_padrao" model="l10n_br.cnab.option">
+        <field name="code">00002</field>
+        <field name="description">Pagamento a Concessionárias de Serviço Público</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00003_padrao" model="l10n_br.cnab.option">
+        <field name="code">00003</field>
+        <field name="description">Pagamento de Dividendos</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00004_padrao" model="l10n_br.cnab.option">
+        <field name="code">00004</field>
+        <field name="description">Pagamento de Salários</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00005_padrao" model="l10n_br.cnab.option">
+        <field name="code">00005</field>
+        <field name="description">Pagamento de Fornecedores</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00006_padrao" model="l10n_br.cnab.option">
+        <field name="code">00006</field>
+        <field name="description">Pagamento de Honorários</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00007_padrao" model="l10n_br.cnab.option">
+        <field name="code">00007</field>
+        <field name="description">Pagamento de Aluguéis e Taxas e Condomínio</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00008_padrao" model="l10n_br.cnab.option">
+        <field name="code">00008</field>
+        <field name="description">Pagamento de Duplicatas e Títulos</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00009_padrao" model="l10n_br.cnab.option">
+        <field name="code">00009</field>
+        <field name="description">Pagamento de Honorários</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00010_padrao" model="l10n_br.cnab.option">
+        <field name="code">00010</field>
+        <field name="description">Crédito em Conta</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00011_padrao" model="l10n_br.cnab.option">
+        <field name="code">00011</field>
+        <field name="description">Pagamento a Corretoras</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00016_padrao" model="l10n_br.cnab.option">
+        <field name="code">00016</field>
+        <field name="description">Crédito em Conta Investimento</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00100_padrao" model="l10n_br.cnab.option">
+        <field name="code">00100</field>
+        <field name="description">Depósito Judicial</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00101_padrao" model="l10n_br.cnab.option">
+        <field name="code">00101</field>
+        <field name="description">Pensão Alimentícia</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00200_padrao" model="l10n_br.cnab.option">
+        <field name="code">00200</field>
+        <field name="description">Transferência Internacional de Reais</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00201_padrao" model="l10n_br.cnab.option">
+        <field name="code">00201</field>
+        <field name="description">Ajuste Posição Mercado Futuro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00204_padrao" model="l10n_br.cnab.option">
+        <field name="code">00204</field>
+        <field name="description">Compra/Venda de Ações – Bolsas de Valores e Mercado de Balcão</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00205_padrao" model="l10n_br.cnab.option">
+        <field name="code">00205</field>
+        <field name="description">Contrato referenciado em Ações/Índices de Ações – BV/BMF</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00300_padrao" model="l10n_br.cnab.option">
+        <field name="code">00300</field>
+        <field name="description">Restituição de Imposto de Renda</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00500_padrao" model="l10n_br.cnab.option">
+        <field name="code">00500</field>
+        <field name="description">Restituição de Prêmio de Seguros</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00501_padrao" model="l10n_br.cnab.option">
+        <field name="code">00501</field>
+        <field name="description">Pagamento de indenização de Sinistro de Seguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00502_padrao" model="l10n_br.cnab.option">
+        <field name="code">00502</field>
+        <field name="description">Pagamento de Prêmio de Co-seguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00503_padrao" model="l10n_br.cnab.option">
+        <field name="code">00503</field>
+        <field name="description">Restituição de prêmio de Co-seguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00504_padrao" model="l10n_br.cnab.option">
+        <field name="code">00504</field>
+        <field name="description">Pagamento de indenização de Co-seguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00505_padrao" model="l10n_br.cnab.option">
+        <field name="code">00505</field>
+        <field name="description">Pagamento de prêmio de Resseguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00506_padrao" model="l10n_br.cnab.option">
+        <field name="code">00506</field>
+        <field name="description">Restituição de prêmio de Resseguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00507_padrao" model="l10n_br.cnab.option">
+        <field name="code">00507</field>
+        <field name="description">Pagamento de Indenização de Sinistro de Resseguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00508_padrao" model="l10n_br.cnab.option">
+        <field name="code">00508</field>
+        <field name="description">Restituição de Indenização de Sinistro de Resseguro</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00509_padrao" model="l10n_br.cnab.option">
+        <field name="code">00509</field>
+        <field name="description">Pagamento de Despesas com Sinistros</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00510_padrao" model="l10n_br.cnab.option">
+        <field name="code">00510</field>
+        <field name="description">Pagamento de Inspeções/Vistorias Prévias</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00511_padrao" model="l10n_br.cnab.option">
+        <field name="code">00511</field>
+        <field name="description">Pagamento de Resgate de Título de Capitalização</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00512_padrao" model="l10n_br.cnab.option">
+        <field name="code">00512</field>
+        <field name="description">Pagamento de Sorteio de Título de Capitalização</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00513_padrao" model="l10n_br.cnab.option">
+        <field name="code">00513</field>
+        <field name="description">Pagamento de Devolução de Mensalidade de Título de Capitalização</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00514_padrao" model="l10n_br.cnab.option">
+        <field name="code">00514</field>
+        <field name="description">Restituição de Contribuição de Plano Previdenciário</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00515_padrao" model="l10n_br.cnab.option">
+        <field name="code">00515</field>
+        <field name="description">Pagamento de Benefício Previdenciário de Pecúlio</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00516_padrao" model="l10n_br.cnab.option">
+        <field name="code">00516</field>
+        <field name="description">Pagamento de Benefício Previdenciário de Pensão</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00517_padrao" model="l10n_br.cnab.option">
+        <field name="code">00517</field>
+        <field name="description">Pagamento de Benefício Previdenciário de Aposentadoria</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00518_padrao" model="l10n_br.cnab.option">
+        <field name="code">00518</field>
+        <field name="description">Pagamento de Resgate Previdenciário</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00519_padrao" model="l10n_br.cnab.option">
+        <field name="code">00519</field>
+        <field name="description">Pagamento de Comissão de Corretagem</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_ted_00520_padrao" model="l10n_br.cnab.option">
+        <field name="code">00520</field>
+        <field name="description">Pagamento de Transferências/Portabilidade de Reserva de Seguro/Previdência</field>
+        <field name="option_type">ted_finality_code</field>
+    </record>
+
+    <!-- Código da Finalidade da DOC Padrão -->
+
+    <record id="codigo_finalidade_doc_01_padrao" model="l10n_br.cnab.option">
+        <field name="code">01</field>
+        <field name="description">Crédito em Conta</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_02_padrao" model="l10n_br.cnab.option">
+        <field name="code">02</field>
+        <field name="description">Pagamento de Aluguel/Condomínio</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_03_padrao" model="l10n_br.cnab.option">
+        <field name="code">03</field>
+        <field name="description">Pagamento de Duplicata/Títulos</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_04_padrao" model="l10n_br.cnab.option">
+        <field name="code">04</field>
+        <field name="description">Pagamento de Dividendos</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_05_padrao" model="l10n_br.cnab.option">
+        <field name="code">05</field>
+        <field name="description">Pagamento de Mensalidade Escolar</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_06_padrao" model="l10n_br.cnab.option">
+        <field name="code">06</field>
+        <field name="description">Pagamento de Salários</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_07_padrao" model="l10n_br.cnab.option">
+        <field name="code">07</field>
+        <field name="description">Pagamento a Fornecedores</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_08_padrao" model="l10n_br.cnab.option">
+        <field name="code">08</field>
+        <field name="description">Operações de Câmbios/Fundos/Bolsa de Valores</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_09_padrao" model="l10n_br.cnab.option">
+        <field name="code">09</field>
+        <field name="description">Repasse de Arrecadação/Pagamento de Tributos</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_10_padrao" model="l10n_br.cnab.option">
+        <field name="code">10</field>
+        <field name="description">Transferência Internacional em Real</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_11_padrao" model="l10n_br.cnab.option">
+        <field name="code">11</field>
+        <field name="description">DOC para Poupança</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_12_padrao" model="l10n_br.cnab.option">
+        <field name="code">12</field>
+        <field name="description">DOC para Depósito Judicial</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_13_padrao" model="l10n_br.cnab.option">
+        <field name="code">13</field>
+        <field name="description">Outros</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_16_padrao" model="l10n_br.cnab.option">
+        <field name="code">16</field>
+        <field name="description">Pagamento de bolsa auxílio</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_17_padrao" model="l10n_br.cnab.option">
+        <field name="code">17</field>
+        <field name="description">Remuneração à cooperado</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_18_padrao" model="l10n_br.cnab.option">
+        <field name="code">18</field>
+        <field name="description">Pagamento de honorários</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+    <record id="codigo_finalidade_doc_19_padrao" model="l10n_br.cnab.option">
+        <field name="code">19</field>
+        <field name="description">Pagamento de prebenda (Remuneração a padres e sacerdotes)</field>
+        <field name="option_type">doc_finality_code</field>
+    </record>
+
+</odoo>
