@@ -45,7 +45,13 @@
                 <field name="amount_interest"/>
             </xpath>
             <xpath expr="//group[@name='right']" position="after">
-                <group name="cnab" string="Informações do CNAB">
+                <group name="cnab" string="CNAB">
+                    <field name="payment_mode_id"/>
+                    <field name="bank_id"/>
+                    <field name="service_type_id"/>
+                    <field name="release_form_id"/>
+                    <field name="doc_finality_code_id"/>
+                    <field name="ted_finality_code_id"/>
                     <field name="own_number" readonly="1"/>
                     <field name="document_number" readonly="1"/>
                     <field name="company_title_identification" readonly="1"/>

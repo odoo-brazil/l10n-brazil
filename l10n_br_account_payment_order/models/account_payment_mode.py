@@ -19,7 +19,16 @@ from ..constants import (
 
 class AccountPaymentMode(models.Model):
     _name = 'account.payment.mode'
-    _inherit = ['account.payment.mode', 'mail.thread']
+    _inherit = [
+	'account.payment.mode',
+	'l10n_br.cnab.configuration',
+	'mail.thread',
+    ]
+
+    internal_sequence_id = fields.Many2one(
+        comodel_name='ir.sequence',
+        string='Sequência',
+    )
 
     instructions = fields.Text(
         string='Instruções de cobrança',
@@ -370,27 +379,3 @@ class AccountPaymentMode(models.Model):
                record.boleto_discount_perc < 0:
                 raise ValidationError(
                     _('O percentual deve ser um valor entre 0 a 100.'))
-
-    @api.onchange('payment_method_id')
-    def _onchange_payment_method_id(self):
-        for record in self:
-            if record.payment_method_code in ('400', '240', '500'):
-                # Campos Default que não devem estar marcados no caso CNAB
-                record.group_lines = False
-                record.generate_move = False
-                record.post_move = False
-                # Selecionavel na Ordem de Pagamento
-                record.payment_order_ok = True
-
-    @api.constrains('own_number_sequence_id')
-    def _check_own_number_sequence_id(self):
-        for record in self:
-            already_in_use = record.search([
-                ('id', '!=', record.id),
-                ('own_number_sequence_id', '=',
-                 record.own_number_sequence_id.id),
-            ])
-            if already_in_use:
-                raise ValidationError(
-                    _('Sequence Own Number already in use by %s.')
-                    % already_in_use.name)

@@ -15,7 +15,8 @@ from ..constants import (
 
 
 class AccountPaymentLine(models.Model):
-    _inherit = 'account.payment.line'
+    _name = 'account.payment.line'
+    _inherit = ['account.payment.line', 'l10n_br.cnab.configuration']
 
     digitable_line = fields.Char(
         string='Linha Digitável',
@@ -96,6 +97,17 @@ class AccountPaymentLine(models.Model):
         default=0.00,
         help='Campo G048 do CNAB',
     )
+
+    payment_mode_id = fields.Many2one(
+        comodel_name='account.payment.mode',
+        string='Payment Mode',
+        ondelete='set null',
+    )
+
+    @api.depends('payment_mode_id')
+    def _compute_bank_id(self):
+        for record in self:
+            record.bank_id = record.payment_mode_id.fixed_journal_id.bank_id
 
     payment_mode_id = fields.Many2one(
         comodel_name='account.payment.mode',
