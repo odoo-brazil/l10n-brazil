@@ -9,10 +9,6 @@ from odoo.exceptions import ValidationError, UserError
 
 from ..constants import (
     AVISO_FAVORECIDO,
-    CODIGO_FINALIDADE_TED,
-    COMPLEMENTO_TIPO_SERVICO,
-    FORMA_LANCAMENTO,
-    TIPO_SERVICO,
     BOLETO_ESPECIE,
 )
 
@@ -51,34 +47,10 @@ class AccountPaymentMode(models.Model):
         string='Comunicação para o sacador avalista',
     )
 
-    service_type = fields.Selection(
-        selection=TIPO_SERVICO,
-        string='Tipo de Serviço',
-        help='Campo G025 do CNAB',
-    )
-
-    release_form = fields.Selection(
-        selection=FORMA_LANCAMENTO,
-        string='Forma Lançamento',
-        help='Campo G029 do CNAB',
-    )
-
     code_convetion = fields.Char(
         string='Código do Convênio no Banco',
         size=20,
         help='Campo G007 do CNAB',
-    )
-
-    doc_finality_code = fields.Selection(
-        selection=COMPLEMENTO_TIPO_SERVICO,
-        string='Complemento do Tipo de Serviço',
-        help='Campo P005 do CNAB',
-    )
-
-    ted_finality_code = fields.Selection(
-        selection=CODIGO_FINALIDADE_TED,
-        string='Código Finalidade da TED',
-        help='Campo P011 do CNAB',
     )
 
     complementary_finality_code = fields.Char(

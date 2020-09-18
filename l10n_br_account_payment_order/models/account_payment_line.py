@@ -8,8 +8,6 @@ from odoo.tools.float_utils import float_round as round
 
 from ..constants import (
     AVISO_FAVORECIDO,
-    CODIGO_FINALIDADE_TED,
-    COMPLEMENTO_TIPO_SERVICO,
 )
 
 
@@ -42,18 +40,6 @@ class AccountPaymentLine(models.Model):
 
     company_title_identification = fields.Char(
         string='Identificação Titulo Empresa',
-    )
-
-    doc_finality_code = fields.Selection(
-        selection=COMPLEMENTO_TIPO_SERVICO,
-        string='Complemento do Tipo de Serviço',
-        help='Campo P005 do CNAB',
-    )
-
-    ted_finality_code = fields.Selection(
-        selection=CODIGO_FINALIDADE_TED,
-        string='Código Finalidade da TED',
-        help='Campo P011 do CNAB',
     )
 
     complementary_finality_code = fields.Char(
@@ -142,14 +128,15 @@ class AccountPaymentLine(models.Model):
             .browse(self.env.context.get('order_id'))
             .payment_mode_id
         )
-        if mode.doc_finality_code:
-            res.update({'doc_finality_code': mode.doc_finality_code})
-        if mode.ted_finality_code:
-            res.update({'ted_finality_code': mode.ted_finality_code})
+        if mode.doc_finality_code_id:
+            res.update({'doc_finality_code_id': mode.doc_finality_code_id})
+        if mode.ted_finality_code_id:
+            res.update({'ted_finality_code_id': mode.ted_finality_code_id})
         if mode.complementary_finality_code:
-            res.update(
-                {'complementary_finality_code': mode.complementary_finality_code}
-            )
+            res.update({
+                'complementary_finality_code':
+                    mode.complementary_finality_code
+            })
         if mode.favored_warning:
             res.update({'favored_warning': mode.favored_warning})
         return res
