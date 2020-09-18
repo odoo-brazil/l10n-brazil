@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Conta Contabil -->
+
+    <record model="account.payment.method" id="account_payment_method_payments">
+        <field name="name">Pagamentos</field>
+        <field name="code">240</field>
+        <field name="payment_type">outbound</field>
+        <field name="bank_account_required" eval="True"/>
+        <field name="payment_order_only" eval="False"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record model="account.journal" id="itau_journal">
+        <field name="outbound_payment_method_ids" eval="[(6,0,[ref('account_payment_method_payments')])]"/>
+    </record>
+
+    <record model="account.payment.mode.line" id="account_payment_mode_line_ted">
+        <field name="name">TED</field>
+        <field name="service_type_id" ref="tipo_servico_20_itau"/>
+        <field name="release_form_id" ref="forma_lancamento_41_itau"/>
+    </record>
+
+    <record model="account.payment.mode.line" id="account_payment_mode_line_das">
+        <field name="name">DAS</field>
+        <field name="service_type_id" ref="tipo_servico_22_itau"/>
+        <field name="release_form_id" ref="forma_lancamento_11_itau"/>
+    </record>
+
+    <record model="account.payment.mode.line" id="account_payment_mode_line_iss">
+        <field name="name">ISS</field>
+        <field name="service_type_id" ref="tipo_servico_22_itau"/>
+        <field name="release_form_id" ref="forma_lancamento_19_itau"/>
+    </record>
+
+    <record model="account.payment.mode.line" id="account_payment_mode_line_utility_payment">
+        <field name="name">Pagamento de Utilitário</field>
+        <field name="service_type_id" ref="tipo_servico_98_itau"/>
+        <field name="release_form_id" ref="forma_lancamento_13_itau"/>
+    </record>
+
+    <record model="account.payment.mode" id="account_payment_mode_sispag">
+        <field name="name">sispag</field>
+        <field name="payment_method_id" ref="account_payment_method_payments"/>
+        <field name="payment_order_ok" eval="True"/>
+        <field name="bank_account_link">fixed</field>
+        <field name="fixed_journal_id" ref="itau_journal"/>
+        <field name="group_lines" eval="False"/>
+        <field name="payment_mode_line_ids" eval="[(6,0,[
+            ref('account_payment_mode_line_ted'),
+            ref('account_payment_mode_line_das'),
+            ref('account_payment_mode_line_iss'),
+            ref('account_payment_mode_line_utility_payment'),
+        ])]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <function model="account.payment.mode" name="payment_method_id_change" eval="[[ref('account_payment_line_ted')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_ted">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_ted"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="600.00"/>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_ted')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_ted')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_das">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_das"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="10.00"/>
+        <field name="communication">858000000275581712382016500711231320312356470477</field>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_das')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_das')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_iss">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_iss"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="20.00"/>
+        <field name="communication">818300000000351237012007512320036434688123299220</field>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_iss')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_iss')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_utility_payment_1">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_utility_payment"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="100.00"/>
+        <field name="communication">836000000015522801380034710717288116000212965610</field>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_utility_payment_1')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_utility_payment_1')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_utility_payment_2">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_utility_payment"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="200.00"/>
+        <field name="communication">836400000011079401380070610530261110080671594119</field>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_utility_payment_2')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_utility_payment_2')]]"/>
+
+    <record model="account.payment.line" id="account_payment_line_utility_payment_3">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_mode_line_id" ref="account_payment_mode_line_utility_payment"/>
+        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="amount_currency" eval="300.00"/>
+        <field name="communication">836100000022434201380079213410922115000104587191</field>
+    </record>
+
+    <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_utility_payment_3')]]"/>
+    <function model="account.payment.line" name="partner_id_change" eval="[[ref('account_payment_line_utility_payment_3')]]"/>
+
+    <record model="account.payment.order" id="account_payment_order_demo">
+        <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
+        <field name="payment_type">outbound</field>
+        <field name="indicative_form_payment">01</field>
+        <field name="movement_instruction_code">00</field>
+        <field name="movement_type">0</field>
+        <field name="code_convention">0001222130126</field>
+        <field name="payment_line_ids" eval="[(6,0,[
+            ref('account_payment_line_ted'),
+            ref('account_payment_line_das'),
+            ref('account_payment_line_iss'),
+            ref('account_payment_line_utility_payment_1'),
+            ref('account_payment_line_utility_payment_2'),
+            ref('account_payment_line_utility_payment_3'),
+        ])]"/>
+    </record>
+    <function model="account.payment.order" name="payment_mode_id_change" eval="[[ref('account_payment_order_demo')]]"/>
+
+</odoo>
