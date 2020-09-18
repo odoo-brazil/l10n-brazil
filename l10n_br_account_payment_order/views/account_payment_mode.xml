@@ -62,6 +62,7 @@
                 <page string="Pagamento">
                     <group>
                         <field name="bank_id" invisible="True"/>
+                        <field name="payment_mode_line_ids"/>
                         <field name="service_type"/>
                         <field name="release_form"/>
                         <field name="service_type_id"/>

@@ -103,10 +103,26 @@ class AccountPaymentLine(models.Model):
         ondelete='set null',
     )
 
+    payment_mode_line_id = fields.Many2one(
+        comodel_name='account.payment.mode.line',
+        string='Payment Mode Line',
+        ondelete='set null',
+        domain="[('payment_mode_id', '=', payment_mode_id)]"
+    )
+
     @api.depends('payment_mode_id')
     def _compute_bank_id(self):
         for record in self:
             record.bank_id = record.payment_mode_id.fixed_journal_id.bank_id
+
+    @api.onchange('payment_mode_line_id')
+    def _onchange_payment_mode_line_id(self):
+        self.service_type_id = self.payment_mode_line_id.service_type_id
+        self.release_form_id = self.payment_mode_line_id.release_form_id
+        self.doc_finality_code_id = \
+            self.payment_mode_line_id.doc_finality_code_id
+        self.ted_finality_code_id = \
+            self.payment_mode_line_id.ted_finality_code_id
 
     @api.multi
     @api.depends('percent_interest', 'amount_currency')
