@@ -14,11 +14,8 @@ from odoo import api, fields, models
 
 from ..constants import (
     CODIGO_INSTRUCAO_MOVIMENTO,
-    FORMA_LANCAMENTO,
-    FORMA_LANCAMENTO_ITAU,
     INDICATIVO_FORMA_PAGAMENTO,
     TIPO_MOVIMENTO,
-    TIPO_SERVICO,
 )
 
 _logger = logging.getLogger(__name__)
@@ -39,25 +36,6 @@ class AccountPaymentOrder(models.Model):
 
     cnab_filename = fields.Char(
         string='CNAB Filename',
-    )
-
-    service_type = fields.Selection(
-        selection=TIPO_SERVICO,
-        string='Tipo de Serviço',
-        help='Campo G025 do CNAB',
-        default='30',
-    )
-
-    release_form = fields.Selection(
-        selection=FORMA_LANCAMENTO,
-        string='Forma Lançamento',
-        help='Campo G029 do CNAB',
-    )
-
-    release_form_itau = fields.Selection(
-        selection=FORMA_LANCAMENTO_ITAU,
-        string='Forma Lançamento Itaú',
-        help='Campo G029 do CNAB',
     )
 
     code_convetion = fields.Char(
