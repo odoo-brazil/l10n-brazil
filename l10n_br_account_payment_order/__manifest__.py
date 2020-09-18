@@ -29,6 +29,7 @@
         'data/ir_cron.xml',
         'data/account_analytic_tag_data.xml',
         'data/cnab_return_move_code_data.xml',
+        'data/l10n_br_cnab_option_data.xml',
 
         # Reports
         'reports/report_print_button_view.xml',

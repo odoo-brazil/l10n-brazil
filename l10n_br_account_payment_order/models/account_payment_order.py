@@ -25,7 +25,8 @@ _logger = logging.getLogger(__name__)
 
 
 class AccountPaymentOrder(models.Model):
-    _inherit = 'account.payment.order'
+    _name = 'account.payment.order'
+    _inherit = ['account.payment.order', 'l10n_br.cnab.configuration']
 
     file_number = fields.Integer(
         string='Número sequencial do arquivo',
@@ -103,6 +104,12 @@ class AccountPaymentOrder(models.Model):
         result['company_title_identification'] =\
             paylines[0].company_title_identification
         result['last_cnab_state'] = paylines[0].move_line_id.cnab_state
+        result['payment_mode_id'] = paylines[0].payment_mode_id.id
+        result['payment_mode_line_id'] = paylines[0].payment_mode_line_id.id
+        result['service_type_id'] = paylines[0].service_type_id.id
+        result['release_form_id'] = paylines[0].release_form_id.id
+        result['doc_finality_code_id'] = paylines[0].doc_finality_code_id.id
+        result['ted_finality_code_id'] = paylines[0].ted_finality_code_id.id
         return result
 
     @api.multi
@@ -116,3 +123,8 @@ class AccountPaymentOrder(models.Model):
             return False
         self.message_post('Arquivo gerado com sucesso')
         return result
+
+    @api.depends('company_partner_bank_id')
+    def _compute_bank_id(self):
+        for record in self:
+            record.bank_id = record.company_partner_bank_id.bank_id
