@@ -30,8 +30,6 @@
                 </div>
             </div>
             <field name="bank_line_count" position="after">
-                <field name="service_type"/>
-                <field name="release_form"/>
                 <field name="bank_id" invisible="True"/>
                 <field name="release_form_id"/>
                 <field name="service_type_id"/>
