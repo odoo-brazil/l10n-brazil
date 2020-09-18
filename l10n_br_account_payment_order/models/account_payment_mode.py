@@ -18,7 +18,8 @@ from ..constants import (
 
 
 class AccountPaymentMode(models.Model):
-    _inherit = 'account.payment.mode'
+    _name = 'account.payment.mode'
+    _inherit = ['account.payment.mode', 'l10n_br.cnab.configuration']
 
     internal_sequence_id = fields.Many2one(
         comodel_name='ir.sequence',
@@ -347,3 +348,8 @@ class AccountPaymentMode(models.Model):
                record.boleto_discount_perc < 0:
                 raise ValidationError(
                     _('O percentual deve ser um valor entre 0 a 100.'))
+
+    @api.depends('fixed_journal_id')
+    def _compute_bank_id(self):
+        for record in self:
+            record.bank_id = record.fixed_journal_id.bank_id

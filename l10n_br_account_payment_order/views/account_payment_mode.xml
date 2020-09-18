@@ -61,11 +61,16 @@
                 </page>
                 <page string="Pagamento">
                     <group>
+                        <field name="bank_id" invisible="True"/>
                         <field name="service_type"/>
                         <field name="release_form"/>
+                        <field name="service_type_id"/>
+                        <field name="release_form_id"/>
                         <field name="code_convetion"/>
                         <field name="doc_finality_code"/>
                         <field name="ted_finality_code"/>
+                        <field name="doc_finality_code_id"/>
+                        <field name="ted_finality_code_id"/>
                         <field name="complementary_finality_code"/>
                         <field name="favored_warning"/>
                     </group>

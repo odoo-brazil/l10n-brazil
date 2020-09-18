@@ -12,7 +12,10 @@
         <field name="inherit_id" ref="account_payment_order.account_payment_order_form"/>
         <field name="arch" type="xml">
             <field name="payment_line_ids" position="replace">
-                <field name="payment_line_ids" context="{'default_payment_type': payment_type}"/>
+                <field name="payment_line_ids" context="{
+                    'default_payment_type': payment_type,
+                    'default_payment_mode_id': payment_mode_id,
+                    'form_view_ref': 'l10n_br_account_payment_order.l10n_br_account_payment_line_form'}"/>
             </field>
             <div class="oe_title" position="before">
                 <div class="alert alert-info" role="alert"
@@ -29,7 +32,11 @@
             <field name="bank_line_count" position="after">
                 <field name="service_type"/>
                 <field name="release_form"/>
-                <field name="release_form_itau"/>
+                <field name="bank_id" invisible="True"/>
+                <field name="release_form_id"/>
+                <field name="service_type_id"/>
+                <field name="doc_finality_code_id"/>
+                <field name="ted_finality_code_id"/>
                 <field name="code_convetion"/>
             </field>
             <field name="company_id" position="after">

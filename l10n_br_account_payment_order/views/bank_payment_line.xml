@@ -8,6 +8,12 @@
         <field name="arch" type="xml">
             <group name="main" position="after">
                 <group>
+                    <field name="payment_mode_id"/>
+                    <field name="bank_id"/>
+                    <field name="service_type_id"/>
+                    <field name="release_form_id"/>
+                    <field name="doc_finality_code_id"/>
+                    <field name="ted_finality_code_id"/>
                     <field name="own_number"/>
                     <field name="document_number"/>
                     <field name="company_title_identification"/>
