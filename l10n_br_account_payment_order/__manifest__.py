@@ -55,6 +55,7 @@
         #  usados pela KMEE e o historico git do arquivo
         # 'views/l10n_br_cnab_retorno_view.xml',
         # 'views/l10n_br_cnab_evento_views.xml',
+        'views/account_payment_mode_line.xml',
         # 'views/l10n_br_payment_cnab.xml',
         # 'views/l10n_br_cobranca_cnab.xml',
         # 'views/l10n_br_cobranca_cnab_lines.xml',

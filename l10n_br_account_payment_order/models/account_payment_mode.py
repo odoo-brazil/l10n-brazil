@@ -287,15 +287,12 @@ class AccountPaymentMode(models.Model):
         track_visibility='always',
     )
 
-    # TODO: Campos many2many não estão sendo registrados pelo track_visibility.
-    #  Debate no Odoo https://github.com/odoo/odoo/issues/10149
-    #  Modulo na OCA v10 que faria isso
-    #  https://github.com/OCA/social/tree/10.0/mail_improved_tracking_value
-    #  Migração do Modulo ainda para a v11
-    #  https://github.com/OCA/social/pull/254
-    #  Devemos incluir esse modulo nas Dependencias OCA do repo e se necessário
-    #  fazer essa migração da 12 para poder usa-lo aqui.
-    # Podem existir diferentes codigos, mesmo no 240
+    payment_mode_line_ids = fields.One2many(
+        comodel_name='account.payment.mode.line',
+        inverse_name='payment_mode_id',
+        string='Payment Mode Lines',
+    )
+
     cnab_liq_return_move_code_ids = fields.Many2many(
         comodel_name='l10n_br_cnab.return.move.code',
         relation='l10n_br_cnab_return_liquidity_move_code_rel',
