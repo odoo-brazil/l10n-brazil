@@ -56,13 +56,14 @@
         <field name="active" eval="True"/>
     </record>
 
-    <function model="account.payment.mode" name="payment_method_id_change" eval="[[ref('account_payment_line_ted')]]"/>
+    <function model="account.payment.mode" name="payment_method_id_change" eval="[[ref('account_payment_mode_sispag')]]"/>
 
     <record model="account.payment.line" id="account_payment_line_ted">
         <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
         <field name="payment_mode_line_id" ref="account_payment_mode_line_ted"/>
         <field name="partner_id" ref="base.res_partner_1"/>
         <field name="amount_currency" eval="600.00"/>
+        <field name="communication">858000000275581712382016500711231320312356470477</field>
     </record>
 
     <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_ted')]]"/>
