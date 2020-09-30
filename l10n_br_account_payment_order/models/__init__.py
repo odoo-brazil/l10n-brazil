@@ -6,6 +6,7 @@ from . import res_company
 from . import account_invoice
 from . import account_move
 from . import account_move_line
+from . import l10n_br_cnab_configuration
 from . import account_payment_mode
 from . import account_payment_mode_line
 from . import account_payment_order
@@ -20,5 +21,4 @@ from . import bank_payment_line
 # from . import l10n_br_cnab_evento
 # from . import l10n_br_cnab_lote
 from . import cnab_return_move_code
-from . import l10n_br_cnab_configuration
 from . import l10n_br_cnab_option
