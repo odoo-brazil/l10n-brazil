@@ -346,4 +346,14 @@
         <field name="bank_name">Unicred</field>
     </record>
 
+    <record id="kmee_bank_sicoob" model="res.partner.bank">
+        <field name="acc_number">1632001</field>
+        <field name="acc_number_dig">8</field>
+        <field name="bra_number">4329</field>
+        <field name="bra_number_dig">0</field>
+        <field name="bank_id" ref="l10n_br_base.res_bank_756"/>
+        <field name="partner_id" ref="l10n_br_base.res_partner_kmee"/>
+        <field name="bank_name">BANCO COOPERATIVO DO BRASIL S.A. (SICOOB)</field>
+    </record>
+
 </odoo>

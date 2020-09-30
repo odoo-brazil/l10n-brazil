@@ -61,9 +61,9 @@
     <record model="account.payment.line" id="account_payment_line_ted">
         <field name="payment_mode_id" ref="account_payment_mode_sispag"/>
         <field name="payment_mode_line_id" ref="account_payment_mode_line_ted"/>
-        <field name="partner_id" ref="base.res_partner_1"/>
+        <field name="partner_id" ref="l10n_br_base.res_partner_kmee"/>
         <field name="amount_currency" eval="600.00"/>
-        <field name="communication">858000000275581712382016500711231320312356470477</field>
+        <field name="communication">TED KMEE</field>
     </record>
 
     <function model="account.payment.line" name="_onchange_payment_mode_line_id" eval="[[ref('account_payment_line_ted')]]"/>
