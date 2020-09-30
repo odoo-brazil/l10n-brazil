@@ -6,7 +6,6 @@ from odoo import api, models, fields
 
 
 class L10nBrCnabOption(models.Model):
-
     _name = 'l10n_br.cnab.option'
 
     code = fields.Char(
