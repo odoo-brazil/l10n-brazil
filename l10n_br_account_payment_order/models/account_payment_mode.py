@@ -259,12 +259,6 @@ class AccountPaymentMode(models.Model):
         track_visibility='always',
     )
 
-    payment_mode_line_ids = fields.One2many(
-        comodel_name='account.payment.mode.line',
-        inverse_name='payment_mode_id',
-        string='Payment Mode Lines',
-    )
-
     cnab_liq_return_move_code_ids = fields.Many2many(
         comodel_name='l10n_br_cnab.return.move.code',
         relation='l10n_br_cnab_return_liquidity_move_code_rel',
