@@ -252,12 +252,6 @@ class AccountPaymentMode(models.Model):
         help='Conta padrão para a Tarifa Bancaria',
     )
 
-    payment_mode_line_ids = fields.One2many(
-        comodel_name='account.payment.mode.line',
-        inverse_name='payment_mode_id',
-        string='Payment Mode Lines',
-    )
-
     cnab_liq_return_move_code_ids = fields.Many2many(
         comodel_name='cnab.return.move.code',
         relation='cnab_return_liquidity_move_code_rel',

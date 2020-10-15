@@ -18,7 +18,6 @@
             </xpath>
             <field name="name" position="after">
                 <field name="payment_mode_id"/>
-                <field name="payment_mode_line_id"/>
             </field>
             <xpath expr="//group[@name='right']" position="after">
                 <group name="cnab" string="CNAB">

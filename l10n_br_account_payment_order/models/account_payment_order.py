@@ -83,7 +83,6 @@ class AccountPaymentOrder(models.Model):
             paylines[0].company_title_identification
         result['last_cnab_state'] = paylines[0].move_line_id.cnab_state
         result['payment_mode_id'] = paylines[0].payment_mode_id.id
-        result['payment_mode_line_id'] = paylines[0].payment_mode_line_id.id
         result['service_type_id'] = paylines[0].service_type_id.id
         result['release_form_id'] = paylines[0].release_form_id.id
         result['doc_finality_code_id'] = paylines[0].doc_finality_code_id.id

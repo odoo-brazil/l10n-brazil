@@ -47,7 +47,6 @@
         # 'views/l10n_br_cnab_evento_views.xml',
         'views/account_invoice.xml',
         'views/account_move_line.xml',
-        'views/account_payment_mode_line.xml',
         # 'views/l10n_br_payment_cnab.xml',
         # 'views/l10n_br_cobranca_cnab.xml',
         # 'views/l10n_br_cobranca_cnab_lines.xml',
