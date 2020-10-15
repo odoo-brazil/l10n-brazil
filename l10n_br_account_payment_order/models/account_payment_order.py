@@ -65,6 +65,18 @@ class AccountPaymentOrder(models.Model):
         string='Payment Method Code'
     )
 
+    is_cnab_lot = fields.Boolean(
+        string="Is it a CNAB lot?",
+        related='payment_mode_id.is_cnab_lot',
+        readonly=True,
+    )
+
+    payment_mode_ids = fields.Many2many(
+        comodel_name='account.payment.mode',
+        string="Payment Modes",
+        domain="[('is_cnab_lot', '=', True)]",
+    )
+
     @api.model
     def _prepare_bank_payment_line(self, paylines):
         result = super()._prepare_bank_payment_line(paylines)

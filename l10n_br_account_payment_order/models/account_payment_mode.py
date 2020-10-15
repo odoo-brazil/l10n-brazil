@@ -268,6 +268,10 @@ class AccountPaymentMode(models.Model):
         track_visibility='always',
     )
 
+    is_cnab_lot = fields.Boolean(
+        string="Is it a CNAB lot?",
+    )
+
     # Codigo de Remessa/Inclusão de Registro Detalhe Liberado
     cnab_sending_code_id = fields.Many2one(
         comodel_name='l10n_br_cnab.mov.instruction.code',

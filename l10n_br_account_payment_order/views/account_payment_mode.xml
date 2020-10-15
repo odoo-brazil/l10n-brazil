@@ -66,8 +66,7 @@
                         <page string="Pagamento" attrs="{'invisible': [('payment_type', '!=', 'outbound')]}">
                             <group>
                         <field name="bank_id" invisible="True"/>
-<!--                                <field name="service_type"/>-->
-<!--                                <field name="release_form"/>-->
+                        <field name="is_cnab_lot"/>
                         <field name="service_type_id"/>
                         <field name="release_form_id"/>
 <!--                                <field name="doc_finality_code"/>-->
