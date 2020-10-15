@@ -87,14 +87,27 @@ class AccountPaymentLine(models.Model):
         comodel_name='account.payment.mode',
         string='Payment Mode',
         ondelete='set null',
+        domain="[('id', 'in', payment_mode_ids)]",
     )
 
+    payment_mode_ids = fields.Many2many(
+        comodel_name='account.payment.mode',
+        string="Payment Modes",
+        readonly=True,
+        related='order_id.payment_mode_ids',
+        domain="[('is_cnab_lot', '=', True)]",
     )
 
     @api.depends('payment_mode_id')
     def _compute_bank_id(self):
         for record in self:
             record.bank_id = record.payment_mode_id.fixed_journal_id.bank_id
+            record.service_type_id = record.payment_mode_id.service_type_id
+            record.release_form_id = record.payment_mode_id.release_form_id
+            record.doc_finality_code_id = \
+                record.payment_mode_id.doc_finality_code_id
+            record.ted_finality_code_id = \
+                record.payment_mode_id.ted_finality_code_id
 
     @api.multi
     @api.depends('percent_interest', 'amount_currency')

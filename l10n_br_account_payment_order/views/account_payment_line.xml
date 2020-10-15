@@ -17,6 +17,7 @@
                 <field name="amount_interest"/>
             </xpath>
             <field name="name" position="after">
+                <field name="payment_mode_ids" invisible="True"/>
                 <field name="payment_mode_id"/>
             </field>
             <xpath expr="//group[@name='right']" position="after">

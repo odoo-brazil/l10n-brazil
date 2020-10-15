@@ -74,6 +74,23 @@ class AccountPaymentOrder(models.Model):
         domain=[('is_export_error', '=', True)],
     )
 
+    is_cnab_lot = fields.Boolean(
+        string="Is it a CNAB lot?",
+        related='payment_mode_id.is_cnab_lot',
+        readonly=True,
+    )
+
+    payment_mode_ids = fields.Many2many(
+        comodel_name='account.payment.mode',
+        string="Payment Modes",
+        domain="[('is_cnab_lot', '=', True)]",
+    )
+
+    @api.onchange('payment_mode_id')
+    def payment_mode_id_change(self):
+        super().payment_mode_id_change()
+        self.payment_mode_ids = [(6, 0, self.payment_mode_id.ids)]
+
     @api.model
     def _prepare_bank_payment_line(self, paylines):
         result = super()._prepare_bank_payment_line(paylines)

@@ -62,6 +62,7 @@
                 <page string="Pagamento">
                     <group>
                         <field name="bank_id" invisible="True"/>
+                        <field name="is_cnab_lot"/>
                         <field name="service_type_id"/>
                         <field name="release_form_id"/>
                         <field name="doc_finality_code_id"/>

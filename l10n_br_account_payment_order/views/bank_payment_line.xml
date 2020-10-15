@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <group name="main" position="after">
                 <group>
+                    <field name="payment_mode_ids" invisible="True"/>
                     <field name="payment_mode_id"/>
                     <field name="bank_id"/>
                     <field name="service_type_id"/>

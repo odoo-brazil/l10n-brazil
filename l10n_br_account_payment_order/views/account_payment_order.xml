@@ -11,6 +11,13 @@
         <field name="model">account.payment.order</field>
         <field name="inherit_id" ref="account_payment_order.account_payment_order_form"/>
         <field name="arch" type="xml">
+            <field name="payment_mode_id" position="attributes">
+                <attribute name="attrs">{'invisible': [('is_cnab_lot', '=', True)]}</attribute>
+            </field>
+            <field name="payment_mode_id" position="after">
+                <field name="is_cnab_lot" invisible="True"/>
+                <field name="payment_mode_ids" widget="many2many_tags" attrs="{'invisible': [('is_cnab_lot', '=', False)]}"/>
+            </field>
             <field name="payment_line_ids" position="replace">
                 <field name="payment_line_ids" context="{
                     'default_payment_type': payment_type,

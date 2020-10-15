@@ -259,6 +259,10 @@ class AccountPaymentMode(models.Model):
         column2='payment_mode_id',
         string='CNAB Liquidity Return Move Code')
 
+    is_cnab_lot = fields.Boolean(
+        string="Is it a CNAB lot?",
+    )
+
     _sql_constraints = [(
         "internal_sequence_id_unique",
         "unique(internal_sequence_id)",
