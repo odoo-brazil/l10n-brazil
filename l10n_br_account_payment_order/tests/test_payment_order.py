@@ -110,9 +110,10 @@ class TestPaymentOrder(TransactionCase):
             if line.amount_currency == 700.0:
                 line.percent_interest = 1.5
                 test_amount_interest = line.amount_interest
-        self.assertEquals(
-            test_amount_interest, 10.5,
-            "Error with compute field amount_interest.")
+            if line.amount_currency == 700.0:
+                self.assertEquals(
+                    test_amount_interest, 10.5,
+                    "Error with compute field amount_interest.")
 
         # Open payment order
         payment_order.draft2open()

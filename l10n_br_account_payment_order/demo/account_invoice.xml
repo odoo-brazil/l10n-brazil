@@ -11,6 +11,7 @@
         <field name="type">out_invoice</field>
         <field name="user_id" ref="base.user_demo"/>
         <field name="payment_mode_id" ref="payment_mode_cobranca_bradesco400"/>
+        <field name="journal_id" search="[('type', '=', 'bank')]"/>
     </record>
 
     <record id="demo_invoice_line_original" model="account.invoice.line">
