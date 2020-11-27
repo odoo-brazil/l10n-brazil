@@ -58,8 +58,8 @@
                     <field name="company_title_identification" readonly="1"/>
                     <field name="movement_type"/>
                     <field name="mov_instruction_code_id" readonly="1"/>
-                    <field name="doc_finality_code" attrs="{'invisible': [('payment_type', '=', 'inbound')]}"/>
-                    <field name="ted_finality_code" attrs="{'invisible': [('payment_type', '=', 'inbound')]}"/>
+<!--                    <field name="doc_finality_code" attrs="{'invisible': [('payment_type', '=', 'inbound')]}"/>-->
+<!--                    <field name="ted_finality_code" attrs="{'invisible': [('payment_type', '=', 'inbound')]}"/>-->
                     <field name="complementary_finality_code" attrs="{'invisible': [('payment_type', '=', 'inbound')]}"/>
                     <field name="favored_warning"/>
                     <field name="payment_method_code" invisible="1"/>
