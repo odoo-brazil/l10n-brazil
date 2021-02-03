@@ -114,3 +114,11 @@ class AccountPaymentOrder(models.Model):
                 record.message_post(body='Arquivo gerado com sucesso.')
 
         return result
+
+    @api.multi
+    def action_done_cancel(self):
+        result = super(AccountPaymentOrder, self).action_done_cancel()
+        for line in self.payment_line_ids:
+            if line.move_line_id:
+                line.move_line_id.cancel_boleto('pedido_cliente')
+        return result

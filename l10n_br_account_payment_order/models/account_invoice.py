@@ -163,7 +163,7 @@ class AccountInvoice(models.Model):
                 interval.transaction_ref = sequence
                 interval.own_number = (
                     sequence if interval.payment_mode_id.generate_own_number
-                    else '0'
+                    else interval.own_number
                 )
                 interval.document_number = numero_documento
                 interval.company_title_identification = hex(interval.id).upper()
@@ -176,7 +176,7 @@ class AccountInvoice(models.Model):
                 # Codigo de Instrução do Movimento pode variar,
                 # mesmo no CNAB 240
                 interval.mov_instruction_code_id = \
-                    inv.payment_mode_id.cnab_sending_code_id.id
+                    inv.payment_mode_id.cnab_sending_code_id
 
     @api.multi
     def action_move_create(self):
@@ -288,7 +288,7 @@ class AccountInvoice(models.Model):
                         # Arquivo Enviado necessário solicitar a Baixa
                         # ao Banco enviando a respectiva Instrução do Movimento
                         line.mov_instruction_code_id = \
-                            line.payment_mode_id.cnab_write_off_code_id.id
+                            line.payment_mode_id.cnab_write_off_code_id
                         line.payment_situation = 'baixa_liquidacao'
                         line.message_post(body=_(
                             'Movement Instruction Code Updated for Request to'
