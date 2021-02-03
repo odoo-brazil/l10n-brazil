@@ -137,8 +137,8 @@ class AccountMoveLine(models.Model):
 
         # Se for uma solicitação de baixa do título é preciso informar o
         # campo debit o codigo original coloca o amount_residual
-        if self.mov_instruction_code_id.id ==\
-                self.payment_mode_id.cnab_write_off_code_id.id:
+        if self.mov_instruction_code_id ==\
+                self.payment_mode_id.cnab_write_off_code_id:
             vals['amount_currency'] = self.credit or self.debit
 
         # TODO - ainda necessário ?
@@ -269,3 +269,37 @@ class AccountMoveLine(models.Model):
                 if record.payment_mode_id.fixed_journal_id:
                     record.journal_payment_mode_id =\
                         record.payment_mode_id.fixed_journal_id.id
+
+    @api.multi
+    def create_account_payment_line_cnab_baixa(self):
+        # TODO: Migrar esse metodo da Invoice para ca
+        pass
+
+    def write_off_method(self):
+        # TODO: Retirar esse metodo no futuro, quando os metodos de pagamento
+        #   do CNAB tiverem o prórpio módulo. Dessa forma iria ter apenas o
+        #   método write_off_manual_payment() nos módulos de pagamento
+        #   filtrando se devem ou não continuar sendo executado para cada caso
+        #   chamado. Semelhante ao que existe no l10n_br_nfse e os módulos
+        #   dependentes dos diversos tipos de provedores
+        res = self.write_off_manual_payment()
+        if not res:
+            self.create_account_payment_line_cnab_baixa()
+
+
+    @api.multi
+    def reconcile(self, writeoff_acc_id=False, writeoff_journal_id=False):
+        res = super().reconcile(writeoff_acc_id, writeoff_journal_id)
+
+        if res:
+            for move_line_id in self:
+                if move_line_id.balance > 0:
+                    # TODO: Verificar o que acontece com reconciliação parcial.
+                    #   Ficam 3 AML? a validação de apenas balance positivo pode
+                    #   dar errado com essa terceira AML?
+                    move_line_id.write_off_method()
+                    if not move_line_id.reconciled and \
+                            move_line_id.amount_residual > 0:
+                        move_line_id.create_residual_payment()
+
+
