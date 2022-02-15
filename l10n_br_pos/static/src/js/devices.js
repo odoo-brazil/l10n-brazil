@@ -211,7 +211,8 @@ odoo.define("l10n_br_pos.devices", function (require) {
                 function (result) {
                     if (result.num_sessao != self.pos.config.sessao_sat) {
                          self.message('cancelar_cfe', {json: order}, {timeout: 5000})
-                         .then(function (result) {
+                         .then(function (retorno_sat) {
+                            let result = retorno_sat;
                              if (result && typeof result === 'object') {
                                 rpc.query({
                                     model: 'pos.order',
@@ -231,6 +232,7 @@ odoo.define("l10n_br_pos.devices", function (require) {
                                         })
                                      }, function (error, event) {
                                          event.preventDefault();
+                                         self.pos.config.sessao_sat++;
                                          self.pos.gui.show_popup('error', {
                                              'title': _t('Error: Tempo Excedido'),
                                              'body': _t('Tempo limite de 30 minutos para cancelamento foi excedido.'),
