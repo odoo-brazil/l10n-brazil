@@ -206,6 +206,7 @@ odoo.define("l10n_br_pos.devices", function (require) {
         },
         cancel_order: function (order) {
              var self = this;
+             paid_order = self.pos.paid_orders.find(x => x.id === order.id);
              order['cnpj_software_house'] = self.pos.config.cnpj_software_house;
              self.pos.proxy.message("sessao_sat", {json: self.pos.config.sessao_sat}, {timeout: 5000}).then(
                 function (result) {
@@ -214,6 +215,7 @@ odoo.define("l10n_br_pos.devices", function (require) {
                          .then(function (retorno_sat) {
                             let result = retorno_sat;
                              if (result && typeof result === 'object') {
+                                self.pos._refund_order(paid_order, retorno_sat);
                                 rpc.query({
                                     model: 'pos.order',
                                     method: 'cancelar_order',

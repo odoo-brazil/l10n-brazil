@@ -55,8 +55,12 @@
         </t>
     </t>
 
-    <t t-extend="PosOrderLine">
-        <t t-jquery='.order-line' t-operation="append">
+    <t t-name="PosOrderLine">
+        <tr class='order-line' t-att-data-id='order.id' t-att-data-chave='order.document_key' t-att-data-xml='order.document_file'>
+            <td><t t-esc='order.name' /></td>
+            <td><t t-esc='order.cnpj_cpf'/></td>
+            <td><t t-esc="order.date_order || moment(order.validation_date).format('YYYY-MM-DD HH:mm:ss')" /></td>
+            <td><t t-esc='order.amount_total || Math.round(order.get_total_with_tax())' /></td>
             <td>
                 <span class="control-button pos_order_reprint">
                     Reimprimir
@@ -67,7 +71,7 @@
                     Cancelar
                 </span>
             </td>
-        </t>
+        </tr>
     </t>
 
 <!--    <t t-extend="OrderWidget">-->

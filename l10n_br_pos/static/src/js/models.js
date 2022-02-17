@@ -369,6 +369,9 @@ odoo.define("l10n_br_pos.models", function (require) {
             }
             return null;
         },
+        _refund_order: function(order, retorno_sat) {
+
+        },
     });
 
     var _config = _.findWhere(models.PosModel.prototype.models, {model: "pos.config"});

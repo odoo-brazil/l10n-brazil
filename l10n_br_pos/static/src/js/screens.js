@@ -34,17 +34,7 @@ odoo.define("l10n_br_pos.screens", function (require) {
                         (response) => {
                             console.log(response);
                             order.set_cfe_return(response);
-                            self.pos.paid_orders.splice(0, 0, {
-                                amount_total: order.get_total_paid() - order.get_change(),
-                                date_order: moment(order.creation_date).format("DD/MM/YYYY hh:mm"),
-                                id: order.sequence_number + 1,
-                                name: order.name,
-                                cnpj_cpf: order.cnpj_cpf || false,
-                                partner_id: order.get_client() ? order.get_client().id : false,
-                                pos_reference: "Order 00001-016-0011",
-                                document_key: response.chaveConsulta,
-                                document_file: response.arquivoCFeSAT
-                            });
+                            self.pos.paid_orders.splice(0, 0, order);
                             resolve(true);
                         },
                         (error) => {
