@@ -466,7 +466,7 @@ class PosOrder(models.Model):
             mail_create_nolog=True, tracking_disable=True,
             mail_create_nosubscribe=True, mail_notrack=True
         ).refund()
-        order.state = 'cancel'
+        order.action_pos_order_cancel()
 
     #
     # @api.one

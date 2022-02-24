@@ -206,7 +206,6 @@ odoo.define("l10n_br_pos.screens", function (require) {
         },
     });
 
-==== BASE ====
     // Screens.PaymentScreenWidget = screens.PaymentScreenWidget.extend({
     //     order_is_valid: function (parent, options) {
     //         var res = PaymentScreenWidgetSuper.prototype.order_is_valid.call(this, parent, options);

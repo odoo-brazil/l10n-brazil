@@ -215,7 +215,7 @@ odoo.define("l10n_br_pos.devices", function (require) {
                          .then(function (retorno_sat) {
                             let result = retorno_sat;
                              if (result && typeof result === 'object') {
-                                if ($('.js_synch .js_connected').hasClass('.hidden')) {
+                                if (self.pos.get("synch").state == 'connected') {
                                     rpc.query({
                                         model: 'pos.order',
                                         method: 'cancelar_order',
