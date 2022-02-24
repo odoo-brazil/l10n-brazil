@@ -199,6 +199,16 @@ class PosOrder(models.Model):
             order.document_file_id = order._save_attachment(
                 file_name=order.document_key + ".xml", file_content=document_file
             ).id
+
+        cancel_document_file = pos_order_vals.get("cancel_document_file")
+        if cancel_document_file:
+            order.cancel_document_file_id = order._save_attachment(
+                file_name=order.cancel_document_key + ".xml",
+                file_content=cancel_document_file
+            ).id
+
+            self._refund_cancelled_order(order)
+
         return order
 
     @api.model
@@ -224,6 +234,13 @@ class PosOrder(models.Model):
                     "document_serie": key.numero_serie,
                 }
             )
+
+        if ui_order.get("cancel_document_key"):
+            temp.update({
+                "cancel_document_session_number": ui_order["cancel_document_session_number"],
+                "cancel_document_key": ui_order["cancel_document_key"],
+            })
+
         result.update(temp)
         return result
 
@@ -431,7 +448,10 @@ class PosOrder(models.Model):
     @api.model
     def cancelar_order(self, result):
         _logger.info(f'Result: {result}')
-        order = self.browse(result['order_id'])
+        if result.get('order_id'):
+            order = self.browse(result['order_id'])
+        else:
+            order = self.search([('document_key', '=', result['chave_consulta'])])
 
         order._populate_cancel_order_fields(result)
         order.cancel_document_file_id = order._save_attachment(
@@ -439,6 +459,9 @@ class PosOrder(models.Model):
             file_content=result['xml']
         ).id
 
+        self._refund_cancelled_order(order)
+
+    def _refund_cancelled_order(self, order):
         order.with_context(
             mail_create_nolog=True, tracking_disable=True,
             mail_create_nosubscribe=True, mail_notrack=True
