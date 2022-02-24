@@ -206,22 +206,25 @@ odoo.define("l10n_br_pos.devices", function (require) {
         },
         cancel_order: function (order) {
              var self = this;
+             var paid_order = self.pos.paid_orders.find(x => x.id === order.id);
              order['cnpj_software_house'] = self.pos.config.cnpj_software_house;
              self.pos.proxy.message("sessao_sat", {json: self.pos.config.sessao_sat}, {timeout: 5000}).then(
                 function (result) {
                     if (result.num_sessao != self.pos.config.sessao_sat) {
                          self.message('cancelar_cfe', {json: order}, {timeout: 5000})
-                         .then(function (result) {
+                         .then(function (retorno_sat) {
+                            let result = retorno_sat;
                              if (result && typeof result === 'object') {
-                                rpc.query({
-                                    model: 'pos.order',
-                                    method: 'cancelar_order',
-                                    args: [result],
-                                 }).then(function (orders) {
-                                         self.pos.gui.show_popup('error', {
-                                             message: _t('Venda Cancelada!'),
-                                             comment: _t('A venda foi cancelada com sucesso.'),
-                                         });
+                                if (self.pos.get("synch").state == 'connected') {
+                                    rpc.query({
+                                        model: 'pos.order',
+                                        method: 'cancelar_order',
+                                        args: [result],
+                                    }).then(function (orders) {
+                                        self.pos.gui.show_popup('error', {
+                                            message: _t('Venda Cancelada!'),
+                                            comment: _t('A venda foi cancelada com sucesso.'),
+                                        });
                                         var config_id = self.pos.config.id;
                                         self.pos.config.sessao_sat++;
                                         rpc.query({
@@ -229,14 +232,49 @@ odoo.define("l10n_br_pos.devices", function (require) {
                                             method: 'update_sessao_sat',
                                             args: [config_id]
                                         })
-                                     }, function (error, event) {
-                                         event.preventDefault();
-                                         self.pos.gui.show_popup('error', {
-                                             'title': _t('Error: Tempo Excedido'),
-                                             'body': _t('Tempo limite de 30 minutos para cancelamento foi excedido.'),
-                                         });
-                                         return false;
-                                     });
+                                    });
+                                } else {
+                                    var json_orders = JSON.parse(self.pos.export_paid_orders());
+                                    var cancelled_order = null;
+                                    for (var index in json_orders.paid_orders) {
+                                        if (json_orders.paid_orders[index].data.document_key == order['chaveConsulta']) {
+                                            cancelled_order = json_orders.paid_orders[index].data;
+                                        }
+                                    }
+                                    if (cancelled_order) {
+                                        cancelled_order.cancel_document_session_number = result['numSessao'];
+                                        cancelled_order.cancel_document_key = result['chave_cfe'];
+                                        cancelled_order.cancel_document_file = result['xml'];
+                                        var json_as_str = JSON.stringify(json_orders);
+                                        self.pos.import_orders(json_as_str);
+
+                                        var config_id = self.pos.config.id;
+                                        self.pos.config.sessao_sat++;
+                                        rpc.query({
+                                            model: 'pos.config',
+                                            method: 'update_sessao_sat',
+                                            args: [config_id]
+                                        })
+                                    } else {
+                                        rpc.query({
+                                            model: 'pos.order',
+                                            method: 'cancelar_order',
+                                            args: [result],
+                                        }).then(function (orders) {
+                                            self.pos.gui.show_popup('error', {
+                                                message: _t('Venda Cancelada!'),
+                                                comment: _t('A venda foi cancelada com sucesso.'),
+                                            });
+                                            var config_id = self.pos.config.id;
+                                            self.pos.config.sessao_sat++;
+                                            rpc.query({
+                                                model: 'pos.config',
+                                                method: 'update_sessao_sat',
+                                                args: [config_id]
+                                            })
+                                        });
+                                    }
+                                }
                              } else {
                                  self.pos.gui.show_popup('error', {
                                      'tittle': _t('Erro SAT: '),

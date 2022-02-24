@@ -34,6 +34,7 @@ odoo.define("l10n_br_pos.screens", function (require) {
                         (response) => {
                             console.log(response);
                             order.set_cfe_return(response);
+                            self.pos.paid_orders.splice(0, 0, order);
                             resolve(true);
                         },
                         (error) => {
@@ -136,6 +137,63 @@ odoo.define("l10n_br_pos.screens", function (require) {
             var self = this;
             this._super();
             this.$('.order-list-contents').delegate('.pos_order_reprint','click',function(event){
+                let selected_order_id = $(this).parent().parent().data('id');
+                rpc.query({
+                    model: 'pos.order',
+                    method: 'retornar_order_by_id',
+                    args: [selected_order_id],
+                    limit: 1,
+                }).then(function (orders){
+                    self.pos.proxy.reprint_cfe(orders);
+                }, function (error, event) {
+                    let order = self.pos.paid_orders.find(x => x.id === selected_order_id);
+                    if (order.hasOwnProperty("document_file") && order.document_file) {
+                        let orderSatObj = {
+                            'order_id': order.id,
+                            'chaveConsulta': order.document_key,
+                            'doc_destinatario': order.cnpj_cpf || '',
+                            'xml_cfe_venda': order.document_file,
+                        }
+                        self.pos.proxy.reprint_cfe(orderSatObj);
+                    }
+                });
+            });
+            this.$('.order-list-contents').delegate('.pos_order_cancel','click',function(event){
+                let selected_order_id = $(this).parent().parent().data('id');
+                rpc.query({
+                    model: 'pos.order',
+                    method: 'retornar_order_by_id',
+                    args: [selected_order_id],
+                    limit: 1,
+                }).then(function (orders){
+                    self.cancel_order_sat(orders);
+                }, function (error, event) {
+                    let order = self.pos.paid_orders.find(x => x.id === selected_order_id);
+                    if (order.hasOwnProperty("document_key") && order.document_key) {
+                        let orderSatObj = {
+                            'order_id': order.id,
+                            'chaveConsulta': order.document_key,
+                            'doc_destinatario': order.cnpj_cpf || '',
+                            'xml_cfe_venda': order.document_file,
+                        }
+                        self.cancel_order_sat(orderSatObj);
+                    }
+                });
+            });
+        },
+        cancel_order_sat: function(order){
+            var self = this;
+
+            var status = this.pos.proxy.get('status');
+            this.pos.proxy.cancel_order(order);
+        },
+    });
+
+    pos_order_screens.PosOrderScreenWidget.include({
+        show: function () {
+            var self = this;
+            this._super();
+            this.$('.order-list-contents').delegate('.pos_order_reprint','click',function(event){
                 rpc.query({
                     model: 'pos.order',
                     method: 'retornar_order_by_id',
@@ -145,28 +203,6 @@ odoo.define("l10n_br_pos.screens", function (require) {
                     self.pos.proxy.reprint_cfe(orders);
                 });
             });
-            this.$('.order-list-contents').delegate('.pos_order_cancel','click',function(event){
-                rpc.query({
-                    model: 'pos.order',
-                    method: 'retornar_order_by_id',
-                    args: [$(this).parent().parent().data('id')],
-                    limit: 1,
-                }).then(function (orders){
-                    self.cancel_order_sat(orders);
-                });
-            });
-        },
-        cancel_order_sat: function(order){
-            var self = this;
-
-            var status = this.pos.proxy.get('status');
-            this.pos.proxy.cancel_order(order);
-//            var sat_status = status.drivers.satcfe ? status.drivers.satcfe.status : false;
-//            if( sat_status == 'connected'){
-//                if(this.pos.config.iface_sat_via_proxy){
-//                    this.pos.proxy.cancel_order(order);
-//                }
-//            }
         },
     });
 

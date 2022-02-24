@@ -93,6 +93,9 @@ odoo.define("l10n_br_pos.models", function (require) {
             this.document_session_number = this.document_session_number || null;
             this.document_key = this.document_key || null;
             this.document_file = this.document_file || null;
+            this.cancel_document_session_number = this.cancel_document_session_number || null;
+            this.cancel_document_key = this.cancel_document_key || null;
+            this.cancel_document_file = this.cancel_document_file || null;
 
             if (options.json) {
                 this.init_from_JSON(options.json);
