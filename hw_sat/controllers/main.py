@@ -17,6 +17,9 @@ import base64
 from datetime import datetime
 import json
 
+from worker.print_queue import imprimir_extrato
+from redis import Redis
+from rq import Queue
 
 _logger = logging.getLogger(__name__)
 
@@ -101,6 +104,7 @@ class Sat(Thread):
         # self.printer = self._init_printer()
         self.device = self._get_device()
         self.assinatura = assinatura
+        self.q = Queue(connection=Redis(host='redis', port=6379))
 
         try:
             self.printer_conf = config.carregar('/odoo/sat/satextrato.ini')
@@ -566,7 +570,8 @@ class Sat(Thread):
             return self._print_extrato_cancelamento(
                 json['xml_cfe_venda'], json['xml_cfe_cacelada'])
         else:
-            return self._print_extrato_venda(json['xml_cfe_venda'])
+            self.q.enqueue(imprimir_extrato, args=(json['xml_cfe_venda'], self.fiscal_printer_type, self.impressora, self.printer_params))
+            return True
 
     def run(self):
         self.device = None
