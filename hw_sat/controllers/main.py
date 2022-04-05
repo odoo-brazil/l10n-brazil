@@ -1,11 +1,8 @@
-import wdb
-
 import logging
 import time
 from threading import Thread, Lock
 from requests import ConnectionError
 from decimal import Decimal as D
-import io
 try:
     from odoo.addons.hw_drivers.controllers.proxy import ProxyController as Controller
     from odoo.addons.hw_drivers.controllers.proxy import proxy_drivers as driver
@@ -13,15 +10,15 @@ except Exception as e:
     from odoo.addons.hw_proxy.controllers.main import Proxy as Controller
     from odoo.addons.hw_proxy.controllers.main import drivers as driver
 from odoo import http
-import base64
 from datetime import datetime
 import json
 
-from worker.print_queue import imprimir_extrato
+from worker_printer_sat.print_queue import imprimir_extrato
 from redis import Redis
 from rq import Queue
 
 _logger = logging.getLogger(__name__)
+
 
 try:
     import satcfe
@@ -539,38 +536,12 @@ class Sat(Thread):
         printer.init()
         return printer
 
-    def _print_extrato_venda(self, xml):
-
-        try:
-            printer = self._init_printer()
-            _logger.info(f'Arquivo para impressao: {base64.b64decode(xml).decode("utf-8")}')
-            ExtratoCFeVenda(
-                fp=io.StringIO(base64.b64decode(xml).decode('utf-8')), impressora=printer, config=self.printer_conf
-            ).imprimir()
-
-        except Exception as e:
-            _logger.info('[HW FISCAL] Impressora - Falha ao imprimir')
-            _logger.info(e)
-        _logger.info('[HW FISCAL] Impressora - OK - _print_extrato_venda')
-        return True
-
-    def _print_extrato_cancelamento(self, xml_venda, xml_cancelamento):
-        if not self.printer:
-            return False
-        extrato = ExtratoCFeCancelamento(
-            io.StringIO(base64.b64decode(xml_venda)),
-            io.StringIO(base64.b64decode(xml_cancelamento)),
-            self.printer
-        )
-        extrato.imprimir()
-        return True
-
     def _reprint_cfe(self, json):
         if json.get('canceled_order'):
-            return self._print_extrato_cancelamento(
-                json['xml_cfe_venda'], json['xml_cfe_cacelada'])
+            self.q.enqueue(imprimir_extrato, args=(json['xml_cfe_venda'], self.fiscal_printer_type, self.impressora, self.printer_params, json['xml_cfe_cacelada']))
+            return True
         else:
-            self.q.enqueue(imprimir_extrato, args=(json['xml_cfe_venda'], self.fiscal_printer_type, self.impressora, self.printer_params))
+            self.q.enqueue(imprimir_extrato, args=(json['xml_cfe_venda'], self.fiscal_printer_type, self.impressora, self.printer_params, False))
             return True
 
     def run(self):
