@@ -6,6 +6,24 @@ Copyright (C) 2016-Today KMEE (https://kmee.com.br)
 */
 
 odoo.define("l10n_br_pos.widgets", function (require) {
+    "use strict";
+
+    var pos_hamburger_menu = require('pos_hamburger_menu.widgets');
+    pos_hamburger_menu.ShowHamburgerMenuWidget.include({
+        renderElement: function () {
+            var self = this;
+            this._super();
+            self.add_menu("reload-server-data", "Reload Server data");
+            this.$('#reload-server-data').click(function(){
+                self.pos.reload_server_data().then(function () {
+                    self.pos.gui.show_popup('alert', {
+                         'tittle': _t('Dados atualizados com sucesso!'),
+                         'body': _t('Os dados da retaguarda foram atualizados corretamente.'),
+                     });
+                });
+            });
+        },
+    });
     // Var QWeb = instance.web.qweb;
     // var _t = instance.web._t;
     //

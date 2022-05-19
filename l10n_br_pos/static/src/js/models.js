@@ -8,6 +8,7 @@ odoo.define("l10n_br_pos.models", function (require) {
     const core = require("web.core");
     const rpc = require('web.rpc');
     const _t = core._t;
+    const session = require('web.session');
 
     const utils = require("web.utils");
     const round_pr = utils.round_precision;
@@ -435,6 +436,84 @@ odoo.define("l10n_br_pos.models", function (require) {
                 return order.get_cnpj_cpf();
             }
             return null;
+        },
+
+        reload_server_data: function(){
+            var self = this;
+            var loaded = new $.Deferred();
+            var progress = 0;
+            var progress_step = 1.0 / self.models.length;
+            var tmp = {}; // this is used to share a temporary state between models loaders
+
+            function load_model(index){
+                if(index >= self.models.length){
+                    loaded.resolve();
+                }else{
+                    var model = self.models[index];
+                    self.chrome.loading_message(_t('Loading')+' '+(model.label || model.model || ''), progress);
+
+                    var cond = typeof model.condition === 'function'  ? model.condition(self,tmp) : true;
+                    if (!cond) {
+                        load_model(index+1);
+                        return;
+                    }
+
+                    var fields =  typeof model.fields === 'function'  ? model.fields(self,tmp)  : model.fields;
+                    var domain =  typeof model.domain === 'function'  ? model.domain(self,tmp)  : model.domain;
+                    var context = typeof model.context === 'function' ? model.context(self,tmp) : model.context || {};
+                    var ids     = typeof model.ids === 'function'     ? model.ids(self,tmp) : model.ids;
+                    var order   = typeof model.order === 'function'   ? model.order(self,tmp):    model.order;
+                    progress += progress_step;
+
+                    if( model.model ){
+                        var params = {
+                            model: model.model,
+                            context: _.extend(context, session.user_context || {}),
+                        };
+
+                        if (model.ids) {
+                            params.method = 'read';
+                            params.args = [ids, fields];
+                        } else {
+                            params.method = 'search_read';
+                            params.domain = domain;
+                            params.fields = fields;
+                            params.orderBy = order;
+                        }
+
+                        rpc.query(params).then(function(result){
+                            try{    // catching exceptions in model.loaded(...)
+                                $.when(model.loaded(self,result,tmp))
+                                    .then(function(){ load_model(index + 1); },
+                                          function(err){ loaded.reject(err); });
+                            }catch(err){
+                                console.error(err.message, err.stack);
+                                loaded.reject(err);
+                            }
+                        },function(err){
+                            loaded.reject(err);
+                        });
+                    }else if( model.loaded ){
+                        try{    // catching exceptions in model.loaded(...)
+                            $.when(model.loaded(self,tmp))
+                                .then(  function(){ load_model(index +1); },
+                                        function(err){ loaded.reject(err); });
+                        }catch(err){
+                            loaded.reject(err);
+                        }
+                    }else{
+                        load_model(index + 1);
+                    }
+                }
+            }
+
+            try{
+                load_model(0);
+            }catch(err){
+                loaded.reject(err);
+            }
+
+            return loaded;
         },
     });
 
