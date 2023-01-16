@@ -106,6 +106,21 @@ odoo.define("l10n_br_pos.models", function (require) {
         },
     });
 
+    models.load_models({
+        model: "pos.invoice.cancel.reason",
+        fields: ["active", "id", "name"],
+        domain: function () {
+            return [["active", "=", true]];
+        },
+        loaded: function (self, invoice_cancel_reasons) {
+            self.invoice_cancel_reasons = invoice_cancel_reasons;
+            self.invoice_cancel_reasons_by_id = {};
+            invoice_cancel_reasons.forEach((opt) => {
+                self.invoice_cancel_reasons_by_id[opt.id] = opt;
+            });
+        },
+    });
+
     var _super_order = models.Order.prototype;
     models.Order = models.Order.extend({
         initialize: function (attributes, options) {

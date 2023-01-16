@@ -27,30 +27,21 @@ odoo.define("l10n_br_pos.CancelOrderButton", function (require) {
             return false;
         }
         async _show_selection_popup() {
-            // TODO: Buscar motivos padrão da retaguarda;
             var cancel_reason = null;
+            const selectionList = [];
 
-            var selectionList = [
-                {
-                    id: 1,
-                    item: {
-                        // Any object!
-                        id: 1,
-                        cancel_reason: "Motivo 1",
-                    },
-                    label: "Motivo 1",
-                    isSelected: false,
-                },
-                {
+            this.env.pos.invoice_cancel_reasons.forEach((opt) => {
+                selectionList.push(this._mount_cancel_reason_list_option(opt));
+            });
+
+            selectionList.push({
+                id: 999999,
+                item: {
                     id: 999999,
-                    item: {
-                        // Any object!
-                        id: 999999,
-                    },
-                    label: "Digitar Motivo",
-                    isSelected: false,
                 },
-            ];
+                label: "Digitar Motivo",
+                isSelected: false,
+            });
 
             const {confirmed, payload} = await this.showPopup("SelectionPopup", {
                 title: this.env._t("Motivo do Cancelamento?"),
@@ -84,6 +75,18 @@ odoo.define("l10n_br_pos.CancelOrderButton", function (require) {
                     });
                 }
             }
+        }
+
+        _mount_cancel_reason_list_option(cancelReason) {
+            return {
+                id: cancelReason.id,
+                item: {
+                    id: cancelReason.id,
+                    cancel_reason: cancelReason.name,
+                },
+                label: cancelReason.name,
+                isSelected: false,
+            };
         }
     }
     CancelOrderButton.template = "CancelOrderButton";

@@ -29,6 +29,8 @@
         "python": ["erpbrasil.base"],
     },
     "data": [
+        "security/pos_invoice_cancel_reason.xml",
+        "views/pos_invoice_cancel_reason.xml",
         # security
         "security/l10n_br_pos_product_fiscal_map.xml",
         # data
