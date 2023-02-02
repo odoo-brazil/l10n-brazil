@@ -384,7 +384,6 @@ odoo.define("l10n_br_pos.models", function (require) {
                 label: "Iniciando Processo de Transmissão",
             });
             this.state_edoc = SITUACAO_EDOC_A_ENVIAR;
-            this._document_status_popup();
             var result = false;
             var processor_result = null;
             // Verifica se os campos do documento fiscal são válidos
@@ -393,6 +392,7 @@ odoo.define("l10n_br_pos.models", function (require) {
                 // Obtem o responsável pelo envio do documento fiscal;
                 var processor = await this._document_get_processor();
                 if (processor) {
+                    this._document_status_popup();
                     // Efetivamente envia o documento fiscal
                     processor_result = await processor.send_order(this);
                     // Valida se foi emitido corretamente e salva os dados do resulto
