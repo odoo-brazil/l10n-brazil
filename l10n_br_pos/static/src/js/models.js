@@ -90,7 +90,7 @@ odoo.define("l10n_br_pos.models", function (require) {
         fields: ['name', 'partner_id','date_order', 'fiscal_coupon_date', 'amount_total','pos_reference','lines','state','session_id','company_id', 'document_key', 'cnpj_cpf', 'cancel_document_key'],
         domain: function (self) {
             var domain = [
-                ["state", "in", ["paid", "done"]],
+                ["document_key", "!=", false],
                 ['amount_total', '>', 0]
             ];
             return domain;
