@@ -1,0 +1,85 @@
+# Copyright (C) 2023  Renato Lima - Akretion <renato.lima@akretion.com.br>
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
+
+from odoo import models
+
+
+class PosOrder(models.Model):
+    _inherit = "pos.order"
+
+    def _prepare_invoice_vals(self):
+        vals = super(PosOrder, self)._prepare_invoice_vals()
+
+        pos_config_id = self.session_id.config_id
+        payment_mode_id = self.payment_ids[0].payment_method_id.payment_mode_id
+
+        vals.update(
+            {
+                "document_type_id": pos_config_id.simplified_document_type_id.id,
+                "fiscal_operation_id": pos_config_id.out_pos_fiscal_operation_id.id,
+                "ind_pres": "1",
+                "document_serie_id": pos_config_id.nfce_document_serie_id.id,
+                "partner_id": pos_config_id.partner_id.id,
+                "payment_mode_id": payment_mode_id.id,
+            }
+        )
+
+        return vals
+
+    def _generate_pos_order_invoice(self):
+        res = super(PosOrder, self)._generate_pos_order_invoice()
+
+        self.account_move.fiscal_document_id.action_document_confirm()
+
+        return res
+
+    def _prepare_invoice_line(self, order_line):
+        vals = super(PosOrder, self)._prepare_invoice_line(order_line)
+        pos_fiscal_map_ids = order_line.product_id.pos_fiscal_map_ids
+        fiscal_tax_ids = [
+            (
+                6,
+                0,
+                [
+                    pos_fiscal_map_ids.icms_tax_id.id,
+                    pos_fiscal_map_ids.ipi_tax_id.id,
+                    pos_fiscal_map_ids.cofins_tax_id.id,
+                    pos_fiscal_map_ids.pis_tax_id.id,
+                ],
+            )
+        ]
+        vals.update(
+            {
+                "product_uom_id": order_line.product_uom_id.id,
+                "fiscal_operation_id": pos_fiscal_map_ids.fiscal_operation_id.id,
+                "tax_icms_or_issqn": "icms",
+                "uom_id": order_line.product_id.uom_id.id,
+                "ncm_id": order_line.product_id.ncm_id.id,
+                "fiscal_operation_line_id": pos_fiscal_map_ids.fiscal_operation_line_id.id,
+                "cfop_id": pos_fiscal_map_ids.cfop_id.id,
+                "uot_id": pos_fiscal_map_ids.uot_id.id,
+                "fiscal_genre_id": order_line.product_id.fiscal_genre_id.id,
+                "icms_tax_id": pos_fiscal_map_ids.icms_tax_id.id,
+                "icms_cst_id": pos_fiscal_map_ids.icms_cst_id.id,
+                "icms_base": pos_fiscal_map_ids.icms_base,
+                "icms_percent": pos_fiscal_map_ids.icms_percent,
+                "icms_value": pos_fiscal_map_ids.icms_value,
+                "ipi_tax_id": pos_fiscal_map_ids.ipi_tax_id.id,
+                "ipi_cst_id": pos_fiscal_map_ids.ipi_cst_id.id,
+                "ipi_base": pos_fiscal_map_ids.ipi_base,
+                "ipi_percent": pos_fiscal_map_ids.ipi_percent,
+                "ipi_value": pos_fiscal_map_ids.ipi_value,
+                "cofins_tax_id": pos_fiscal_map_ids.cofins_tax_id.id,
+                "cofins_cst_id": pos_fiscal_map_ids.cofins_cst_id.id,
+                "cofins_base": pos_fiscal_map_ids.cofins_base,
+                "cofins_percent": pos_fiscal_map_ids.cofins_percent,
+                "cofins_value": pos_fiscal_map_ids.cofins_value,
+                "pis_tax_id": pos_fiscal_map_ids.pis_tax_id.id,
+                "pis_cst_id": pos_fiscal_map_ids.pis_cst_id.id,
+                "pis_base": pos_fiscal_map_ids.pis_base,
+                "pis_percent": pos_fiscal_map_ids.pis_percent,
+                "pis_value": pos_fiscal_map_ids.pis_value,
+                "fiscal_tax_ids": fiscal_tax_ids,
+            }
+        )
+        return vals
