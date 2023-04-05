@@ -371,26 +371,30 @@ class Sat(Thread):
             dados_venda = self.__prepare_send_cfe(cfe_json)
             _logger.info(dados_venda.validar())
             _logger.info(dados_venda.documento())
-            resposta = self.device.enviar_dados_venda(dados_venda=dados_venda)
-            _logger.info(resposta.numeroSessao)
-            _logger.info(resposta.EEEEE)
-            _logger.info(resposta.CCCC)
-            _logger.info(resposta.mensagem)
-            _logger.info(resposta.cod)
-            _logger.info(resposta.mensagemSEFAZ)
-            return json.dumps(resposta.__dict__, cls=RespostaEncoder)
+            resposta_consulta = self.device.consultar_sat()
+            _logger.info(f"Consultar sat: {resposta_consulta.EEEEE}")
+            if resposta_consulta.EEEEE == '08000':
+                resposta = self.device.enviar_dados_venda(
+                    dados_venda=dados_venda)
+                _logger.info(resposta.numeroSessao)
+                _logger.info(resposta.EEEEE)
+                _logger.info(resposta.CCCC)
+                _logger.info(resposta.mensagem)
+                _logger.info(resposta.cod)
+                _logger.info(resposta.mensagemSEFAZ)
+                return json.dumps(resposta.__dict__, cls=RespostaEncoder)
+            else:
+                return 'SAT Ocupado!'
 
         except Exception as e:
             if hasattr(e, 'resposta'):
-                _logger.info(e)
-                return e.resposta.mensagem
+                return f"{e.resposta.EEEEE} {e.resposta.mensagem} " \
+                       f"{e.resposta.cod} {e.resposta.mensagemSEFAZ}"
             elif hasattr(e, 'message'):
-                _logger.info(e)
                 return e.message
             else:
-                _logger.info(e)
-                return "Erro ao validar os dados para o xml! " \
-                       "Contate o suporte técnico."
+                return f"""Erro ao validar os dados para o xml!
+                Contate o suporte t  cnico. Erro: {e.args}"""
 
     def __prepare_cancel_cfe(self, chCanc, cnpj, doc_destinatario=False):
         kwargs = {}
@@ -591,6 +595,8 @@ class Sat(Thread):
                 if not self.device:
                     time.sleep(40)
 
+order_transmiting = False
+
 
 class SatDriver(Controller):
 
@@ -609,7 +615,19 @@ class SatDriver(Controller):
     @http.route('/hw_proxy/enviar_cfe_sat/', type='json', auth='none', cors='*')
     def enviar_cfe_sat(self, json):
         _logger.info('enviar_cfe_sat')
-        return driver['hw_fiscal'].action_call_sat('send', json)
+        _logger.info(f"Starting SAT: {driver['hw_fiscal']}")
+        global order_transmiting
+        _logger.info(f"Order Transmiting: {order_transmiting}")
+        if not order_transmiting:
+            order_transmiting = json['name']
+            res = driver['hw_fiscal'].action_call_sat('send', json)
+            _logger.info('Finishing enviar_cfe_sat')
+            _logger.info("Realising SAT: {driver['hw_fiscal']}")
+            order_transmiting = False
+        else:
+            res = 'SAT Ocupado!'
+
+        return res
 
     @http.route('/hw_proxy/cancelar_cfe/', type='json', auth='none', cors='*')
     def cancelar_cfe(self, json):
