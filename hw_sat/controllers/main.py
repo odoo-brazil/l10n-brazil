@@ -5,6 +5,7 @@ from threading import Thread, Lock
 from requests import ConnectionError
 from decimal import Decimal as D
 import io
+from collections import OrderedDict
 
 try:
     from odoo.addons.hw_drivers.controllers.proxy import ProxyController as Controller
@@ -74,6 +75,9 @@ TAX_FRAMEWORK_NORMAL = "3"
 TWOPLACES = D(10) ** -2
 FOURPLACES = D(10) ** -4
 
+order_transmiting = False
+
+sended_orders = OrderedDict()
 
 class RespostaEncoder(json.JSONEncoder):
     def default(self, o):
@@ -118,6 +122,16 @@ class Sat(Thread):
         self.lockedstart()
         return self.status
 
+    def check_sendered_orders_limit(self):
+        global sended_orders
+        if len(sended_orders) > 15:
+            _logger.info("Cleanning sended orders!")
+            last_key = next(reversed(sended_orders))
+            last_order = {last_key: sended_orders[last_key]}
+            sended_orders.clear()
+            sended_orders.update(last_order)
+            _logger.info(f"Sended Orders: {sended_orders}")
+
     def set_status(self, status, message=None):
         if status == self.status['status']:
             if message is not None and message != self.status['messages'][-1]:
@@ -154,6 +168,7 @@ class Sat(Thread):
                 try:
                     if self.device.consultar_sat():
                         self.set_status('connected', 'Connected to SAT')
+                        self.check_sendered_orders_limit()
                 except ErroRespostaSATInvalida as ex_sat_invalida:
                     # o equipamento retornou uma resposta que não faz sentido;
                     # loga, e lança novamente ou lida de alguma maneira
@@ -595,8 +610,6 @@ class Sat(Thread):
                 if not self.device:
                     time.sleep(40)
 
-order_transmiting = False
-
 
 class SatDriver(Controller):
 
@@ -617,13 +630,20 @@ class SatDriver(Controller):
         _logger.info('enviar_cfe_sat')
         _logger.info(f"Starting SAT: {driver['hw_fiscal']}")
         global order_transmiting
+        global sended_orders
         _logger.info(f"Order Transmiting: {order_transmiting}")
-        if not order_transmiting:
+        if not sended_orders.get(json['name']) and not order_transmiting:
             order_transmiting = json['name']
+            _logger.info(f'Sended Order: {sended_orders.keys()}')
             res = driver['hw_fiscal'].action_call_sat('send', json)
             _logger.info('Finishing enviar_cfe_sat')
-            _logger.info("Realising SAT: {driver['hw_fiscal']}")
+            _logger.info(f"Realising SAT: {driver['hw_fiscal']}")
+            sended_orders.update({json['name']: res})
             order_transmiting = False
+        elif sended_orders.get(json['name']):
+            _logger.info(
+                f"Resgatando valores existentes para venda: {json['name']}")
+            res = sended_orders.get(json['name'])
         else:
             res = 'SAT Ocupado!'
 
