@@ -79,6 +79,7 @@ order_transmiting = False
 
 sended_orders = OrderedDict()
 
+
 class RespostaEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
@@ -124,7 +125,7 @@ class Sat(Thread):
 
     def check_sendered_orders_limit(self):
         global sended_orders
-        if len(sended_orders) > 15:
+        if len(sended_orders) > 20:
             _logger.info("Cleanning sended orders!")
             last_key = next(reversed(sended_orders))
             last_order = {last_key: sended_orders[last_key]}
@@ -409,7 +410,7 @@ class Sat(Thread):
                 return e.message
             else:
                 return f"""Erro ao validar os dados para o xml!
-                Contate o suporte t  cnico. Erro: {e.args}"""
+                Contate o suporte tecnico. Erro: {e.args}"""
 
     def __prepare_cancel_cfe(self, chCanc, cnpj, doc_destinatario=False):
         kwargs = {}
@@ -444,7 +445,7 @@ class Sat(Thread):
                 return e.message
             else:
                 return "Erro ao validar os dados para o xml! " \
-                       "Contate o suporte técnico."
+                       "Contate o suporte tecnico."
 
     def _preparar_retorno_sessao_sat(self, retorno_sat, error=False):
         obj_sessao = {}
@@ -604,7 +605,7 @@ class Sat(Thread):
         while True:
             if self.device:
                 self.status_sat()
-                time.sleep(40)
+                time.sleep(300)
             else:
                 self.device = self.action_call_sat('get_device')
                 if not self.device:
@@ -638,7 +639,8 @@ class SatDriver(Controller):
             res = driver['hw_fiscal'].action_call_sat('send', json)
             _logger.info('Finishing enviar_cfe_sat')
             _logger.info(f"Realising SAT: {driver['hw_fiscal']}")
-            sended_orders.update({json['name']: res})
+            if '06000' in res:
+                sended_orders.update({json['name']: res})
             order_transmiting = False
         elif sended_orders.get(json['name']):
             _logger.info(
