@@ -125,7 +125,7 @@ class Sat(Thread):
 
     def check_sendered_orders_limit(self):
         global sended_orders
-        if len(sended_orders) > 20:
+        if len(sended_orders) > 30:
             _logger.info("Cleanning sended orders!")
             last_key = next(reversed(sended_orders))
             last_order = {last_key: sended_orders[last_key]}
@@ -164,6 +164,10 @@ class Sat(Thread):
         )
 
     def status_sat(self):
+        global order_transmiting
+        if order_transmiting:
+            _logger.info("Transmitting Order, aborting status consult")
+            return
         with self.satlock:
             if self.device:
                 try:
@@ -636,6 +640,7 @@ class SatDriver(Controller):
         if not sended_orders.get(json['name']) and not order_transmiting:
             order_transmiting = json['name']
             _logger.info(f'Sended Order: {sended_orders.keys()}')
+            _logger.info(f'Order name: {json["name"]}')
             res = driver['hw_fiscal'].action_call_sat('send', json)
             _logger.info('Finishing enviar_cfe_sat')
             _logger.info(f"Realising SAT: {driver['hw_fiscal']}")
