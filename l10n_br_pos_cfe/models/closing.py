@@ -1,8 +1,12 @@
 # © 2023 KMEE INFORMATICA LTDA (https://kmee.com.br)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import base64
+import calendar
 import logging
 import os
+from datetime import datetime
+
+import pytz
 
 from odoo import _, fields, models
 from odoo.exceptions import RedirectWarning
@@ -26,7 +30,25 @@ class FiscalClosing(models.Model):
 
     def _prepare_files(self, temp_dir):
         temp_dir = super(FiscalClosing, self)._prepare_files(temp_dir)
-        date_min, date_max = self._date_range()
+        date_range = calendar.monthrange(int(self.year), int(self.month))
+        date_min = datetime(
+            int(self.year),
+            int(self.month),
+            1,
+            0,
+            0,
+            1,
+            tzinfo=pytz.timezone(self.env.context["tz"]),
+        ).astimezone(pytz.utc)
+        date_max = datetime(
+            int(self.year),
+            int(self.month),
+            date_range[1],
+            23,
+            59,
+            59,
+            tzinfo=pytz.timezone(self.env.context["tz"]),
+        ).astimezone(pytz.utc)
         orders = self.env["pos.order"].search(
             [
                 ("company_id", "=", self.company_id.id),
